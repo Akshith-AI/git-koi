@@ -1,4 +1,40 @@
-# Git koi
+# LTKoi
+
+LTKoi is a work-in-progress adaptation of
+[git-koi](https://github.com/yalongwastaken/git-koi) that will turn LeetCode
+progress into a male Halfmoon betta with koi marbling.
+
+Two output modes are planned:
+
+- **Betta:** a LeetCode betta whose growth, colors, and patterns reflect solving
+  progress.
+- **Pond:** the LeetCode betta alongside a GitHub koi, each developing from its
+  own account's activity.
+
+**Current status:** the inherited GitHub koi generator works as the foundation.
+LeetCode collection, the betta renderer, and the shared pond are not implemented
+yet. The executable and Rust package are still named `git-koi`; the upstream
+usage guide below describes the existing functionality.
+
+See the [roadmap](docs/roadmap.md) for the five implementation stages and the
+[local baseline guide](docs/local-baseline.md) for a sample render without
+GitHub authentication.
+
+## Attribution
+
+LTKoi is maintained in
+[Akshith-AI/git-koi](https://github.com/Akshith-AI/git-koi) and is based on
+[git-koi](https://github.com/yalongwastaken/git-koi) by
+[Anthony Yalong (@yalongwastaken)](https://github.com/yalongwastaken). The
+existing koi geometry, coloring, movement, rendering, GIF output, and supporting
+code originate from his project. The images below are upstream koi examples, not
+previews of the planned betta.
+
+The original MIT license and copyright notice are preserved in
+[LICENSE](LICENSE). See [NOTICE.md](NOTICE.md) for provenance and the scope of
+this adaptation.
+
+## Original GitHub koi functionality
 
 Git koi draws a pixel-art koi from a GitHub account's public activity. Its
 languages color it, its contributions grow it, its streaks mark it, and the day
@@ -43,7 +79,7 @@ the Rust library underneath is published on crates.io.
 Action in a profile workflow, the command line, and the library. The API is
 documented on [docs.rs](https://docs.rs/git-koi).
 
-## Author
+## Original project author
 
 **Anthony Yalong**
 
