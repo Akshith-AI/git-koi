@@ -44,8 +44,15 @@ username and a shared pond for separate GitHub and LeetCode usernames. Each fish
 retains independent progression. Compose the two fish and coordinate their paths
 in the shared scene. Handle unavailable activity without fabricating a streak.
 
+Also provide an interactive website embed: hovering over the betta spreads its
+Halfmoon tail and fins and flares its gill covers; leaving the fish eases back to
+normal swimming. Tapping triggers a brief flare on touch devices. Respect reduced
+motion preferences and offer keyboard focus activation. GIFs remain the portable
+README format and cannot react to pointer events.
+
 Acceptance: seamless looping GIFs for both modes, with no clipped fins and with
-both fish readable in the pond.
+both fish readable in the pond; an interactive website preview supports hover,
+keyboard focus, touch, and reduced motion.
 
 ## 5. Release and onboarding
 
