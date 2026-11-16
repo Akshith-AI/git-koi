@@ -25,6 +25,7 @@ pub mod coat;
 pub mod collect;
 pub mod history;
 pub mod koi;
+pub mod leetcode;
 pub mod markings;
 pub mod motion;
 pub mod output;
