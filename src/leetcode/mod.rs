@@ -5,3 +5,5 @@
 mod model;
 
 pub use model::*;
+mod transport;
+pub use transport::{CurlLeetCodeClient, LEETCODE_ENDPOINT, LeetCodeClient};
