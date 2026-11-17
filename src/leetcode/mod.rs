@@ -9,3 +9,5 @@ mod transport;
 pub use transport::{CurlLeetCodeClient, LEETCODE_ENDPOINT, LeetCodeClient};
 mod profile;
 pub use profile::{PROFILE_QUERY, parse_profile, validate_username};
+mod topics;
+pub use topics::{TOPICS_QUERY, parse_topics, topic_weights};
