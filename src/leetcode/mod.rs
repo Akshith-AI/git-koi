@@ -7,3 +7,5 @@ mod model;
 pub use model::*;
 mod transport;
 pub use transport::{CurlLeetCodeClient, LEETCODE_ENDPOINT, LeetCodeClient};
+mod profile;
+pub use profile::{PROFILE_QUERY, parse_profile, validate_username};
