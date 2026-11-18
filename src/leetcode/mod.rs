@@ -13,3 +13,5 @@ mod topics;
 pub use topics::{TOPICS_QUERY, parse_topics, topic_weights};
 mod calendar;
 pub use calendar::{CALENDAR_QUERY, parse_calendar};
+mod recent;
+pub use recent::{RECENT_QUERY, parse_recent};
