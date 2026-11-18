@@ -11,11 +11,13 @@ use git_koi::coat::KoiBody;
 use git_koi::collect::{GhCli, collect_account_snapshot};
 use git_koi::history::AccountSnapshot;
 use git_koi::koi::derive_koi_development;
+use git_koi::leetcode::{CurlLeetCodeClient, collect_leetcode_snapshot};
 use git_koi::motion::frame_count;
 use git_koi::output::{encode_gif, encode_png, encode_preview_html};
 use git_koi::render::{KoiFrame, render_koi, render_swim_frame};
 
 const USAGE: &str = "Usage: git-koi collect LOGIN [--output FILE]
+       git-koi collect-leetcode USERNAME [--output FILE]
        git-koi render SNAPSHOT --output-dir DIR [--body BODY]
        git-koi --help | --version
 Collect LOGIN's public GitHub snapshot as JSON through `gh api`: public owned and
@@ -27,6 +29,10 @@ Render a collected SNAPSHOT into DIR: koi.gif swims the behavior chosen for its
 observation date, koi.png is the still koi, and preview.html shows both on light and
 dark backgrounds. BODY is white (the default), black, asagi, tea, gold, or platinum.
 The files are replaced only after all of them render.
+Collect-leetcode writes a versioned public LeetCode snapshot as JSON using curl.
+No login is needed. Optional unavailable fields include a diagnostic instead of zero.
+LeetCode snapshots are for the upcoming betta renderer; render currently accepts
+GitHub snapshots only. Output parents must already exist.
 Errors go to stderr and exit 1; invalid usage exits 2.
 Examples: git-koi collect octocat --output snapshot.json
           git-koi render snapshot.json --output-dir koi --body asagi";
@@ -48,13 +54,28 @@ fn main() -> ExitCode {
         .map(|argument| argument.to_str())
         .collect();
     match argument_texts.as_slice() {
-        [Some("--help")] | [Some("collect" | "render"), Some("--help")] => {
+        [Some("--help")]
+        | [
+            Some("collect" | "collect-leetcode" | "render"),
+            Some("--help"),
+        ] => {
             println!("{USAGE}");
             ExitCode::SUCCESS
         }
         [Some("--version")] => {
             println!("git-koi {}", env!("CARGO_PKG_VERSION"));
             ExitCode::SUCCESS
+        }
+        [Some("collect-leetcode"), Some(username)] if !username.starts_with('-') => {
+            run_collect_leetcode(username, None)
+        }
+        [
+            Some("collect-leetcode"),
+            Some(username),
+            Some("--output"),
+            _,
+        ] if !username.starts_with('-') => {
+            run_collect_leetcode(username, Some(Path::new(&program_arguments[3])))
         }
         [Some("collect"), Some(login)] if !login.starts_with('-') => run_collect(login, None),
         [Some("collect"), Some(login), Some("--output"), _] if !login.starts_with('-') => {
@@ -84,6 +105,22 @@ fn main() -> ExitCode {
         _ => {
             eprintln!("{USAGE}");
             ExitCode::from(2)
+        }
+    }
+}
+
+fn run_collect_leetcode(username: &str, output_path: Option<&Path>) -> ExitCode {
+    let result = collect_leetcode_snapshot(&CurlLeetCodeClient, username, current_utc_date())
+        .map_err(|error| error.to_string())
+        .and_then(|snapshot| {
+            serde_json::to_string_pretty(&snapshot).map_err(|error| error.to_string())
+        })
+        .and_then(|json| write_snapshot(&format!("{json}\n"), output_path));
+    match result {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(message) => {
+            eprintln!("git-koi: {message}");
+            ExitCode::FAILURE
         }
     }
 }
