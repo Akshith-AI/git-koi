@@ -1,0 +1,10 @@
+{
+  "data": {
+    "matchedUser": null
+  },
+  "errors": [
+    {
+      "message": "That user does not exist."
+    }
+  ]
+}

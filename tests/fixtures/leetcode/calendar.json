@@ -1,0 +1,11 @@
+{
+  "data": {
+    "matchedUser": {
+      "userCalendar": {
+        "streak": 2,
+        "totalActiveDays": 2,
+        "submissionCalendar": "{\"1794787200\": 3, \"1794873600\": 2}"
+      }
+    }
+  }
+}
