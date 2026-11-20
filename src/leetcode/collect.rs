@@ -20,7 +20,13 @@ pub fn collect_leetcode_snapshot(
 ) -> Result<LeetCodeSnapshot, LeetCodeError> {
     validate_username(username)?;
     let variables = variables(username);
+    let requested_username = username;
     let (username, solved) = parse_profile(&client.query(PROFILE_QUERY, &variables)?)?;
+    if !username.eq_ignore_ascii_case(requested_username) {
+        return Err(invalid(
+            "returned profile does not match the requested username",
+        ));
+    }
     let topics = available(
         client
             .query(TOPICS_QUERY, &variables)

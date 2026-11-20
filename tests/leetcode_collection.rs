@@ -177,3 +177,10 @@ fn topics_cannot_exceed_the_unique_solved_total() {
     let snapshot = collect_leetcode_snapshot(&client, "ExampleCoder", date()).unwrap();
     assert!(matches!(snapshot.topics, Availability::Unavailable { .. }));
 }
+
+#[test]
+fn mismatched_identity_cannot_silently_generate_another_users_fish() {
+    let client = client(vec![Ok(fixture("profile"))]);
+    assert!(collect_leetcode_snapshot(&client, "AnotherCoder", date()).is_err());
+    assert_eq!(client.calls.borrow().len(), 1);
+}

@@ -25,6 +25,12 @@ pub fn validate_username(username: &str) -> Result<(), LeetCodeError> {
 
 /// Parse required profile data; never infer empty counts from a missing account.
 pub fn parse_profile(response: &Value) -> Result<(String, SolvedCounts), LeetCodeError> {
+    if response
+        .get("errors")
+        .is_some_and(|errors| !errors.is_array())
+    {
+        return Err(invalid("errors must be an array"));
+    }
     let missing_user = response
         .pointer("/data/matchedUser")
         .is_some_and(Value::is_null);

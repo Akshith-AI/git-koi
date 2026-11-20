@@ -161,10 +161,16 @@ fn invalid_recent_timestamps_and_oversized_windows_fail() {
         assert!(parse_recent(&response, date()).is_err());
     }
     let mut response = recent();
-    response["data"]["recentAcSubmissionList"] =
-        json!(vec![
-            response["data"]["recentAcSubmissionList"][0].clone();
-            21
-        ]);
+    let repeated = vec![response["data"]["recentAcSubmissionList"][0].clone(); 21];
+    response["data"]["recentAcSubmissionList"] = json!(repeated);
     assert!(parse_recent(&response, date()).is_err());
+}
+
+#[test]
+fn malformed_error_envelopes_are_not_misclassified_as_unknown_users() {
+    let response = json!({"data":{"matchedUser":null}, "errors":{}});
+    assert!(matches!(
+        parse_profile(&response),
+        Err(LeetCodeError::InvalidData(_))
+    ));
 }
