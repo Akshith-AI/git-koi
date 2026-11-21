@@ -2,8 +2,9 @@
 
 > This is the inherited **git-koi** usage guide. Its published package, release
 > links, and Action example refer to Anthony Yalong's original project. For this
-> LTKoi fork, start with the [local baseline guide](local-baseline.md). LeetCode
-> betta and shared-pond modes are planned and are not available yet.
+> LTKoi fork, start with the [local baseline guide](local-baseline.md) or the
+> [LeetCode collection guide](leetcode.md). Betta and shared-pond rendering
+> modes are planned and are not available yet.
 
 Three ways in: a koi on your profile README, the command line, and the library.
 Each stands alone.

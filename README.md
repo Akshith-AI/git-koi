@@ -11,10 +11,19 @@ Two output modes are planned:
 - **Pond:** the LeetCode betta alongside a GitHub koi, each developing from its
   own account's activity.
 
-**Current status:** the inherited GitHub koi generator works as the foundation.
-LeetCode collection, the betta renderer, and the shared pond are not implemented
-yet. The executable and Rust package are still named `git-koi`; the upstream
-usage guide below describes the existing functionality.
+**Current status:** the GitHub koi generator and LeetCode profile collector are
+available. The betta renderer, shared pond, and interactive website embed are
+not implemented yet. The executable and Rust package are still named `git-koi`.
+
+Collect a public LeetCode profile from this checkout:
+
+```sh
+cargo run --release --locked -- collect-leetcode YOUR_LEETCODE_USERNAME --output target/leetcode.json
+```
+
+See the [LeetCode guide](docs/leetcode.md) for requirements, field meanings,
+topic overlap, and unavailable-data handling. This creates data for the upcoming
+betta renderer; it does not generate a betta GIF yet.
 
 See the [roadmap](docs/roadmap.md) for the five implementation stages and the
 [local baseline guide](docs/local-baseline.md) for a sample render without
