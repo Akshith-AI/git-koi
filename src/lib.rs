@@ -21,6 +21,7 @@
 #![warn(missing_docs)]
 
 pub mod behavior;
+pub mod betta;
 pub mod coat;
 pub mod collect;
 pub mod history;
