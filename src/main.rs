@@ -7,17 +7,19 @@ use std::{env, fs};
 
 use chrono::{DateTime, NaiveDate};
 use git_koi::behavior::{Behavior, select_behavior};
+use git_koi::betta::{betta_preview, derive_betta_development, render_betta};
 use git_koi::coat::KoiBody;
 use git_koi::collect::{GhCli, collect_account_snapshot};
 use git_koi::history::AccountSnapshot;
 use git_koi::koi::derive_koi_development;
-use git_koi::leetcode::{CurlLeetCodeClient, collect_leetcode_snapshot};
+use git_koi::leetcode::{CurlLeetCodeClient, LeetCodeSnapshot, collect_leetcode_snapshot};
 use git_koi::motion::frame_count;
-use git_koi::output::{encode_gif, encode_png, encode_preview_html};
+use git_koi::output::{encode_gif, encode_png, encode_preview_html, encode_svg};
 use git_koi::render::{KoiFrame, render_koi, render_swim_frame};
 
 const USAGE: &str = "Usage: git-koi collect LOGIN [--output FILE]
        git-koi collect-leetcode USERNAME [--output FILE]
+       git-koi render-betta SNAPSHOT --output-dir DIR
        git-koi render SNAPSHOT --output-dir DIR [--body BODY]
        git-koi --help | --version
 Collect LOGIN's public GitHub snapshot as JSON through `gh api`: public owned and
@@ -31,8 +33,9 @@ dark backgrounds. BODY is white (the default), black, asagi, tea, gold, or plati
 The files are replaced only after all of them render.
 Collect-leetcode writes a versioned public LeetCode snapshot as JSON using curl.
 No login is needed. Optional unavailable fields include a diagnostic instead of zero.
-LeetCode snapshots are for the upcoming betta renderer; render currently accepts
-GitHub snapshots only. Output parents must already exist.
+Render-betta reads a LeetCode snapshot and writes betta.png, betta.svg, traits.json,
+and preview.html. It draws a still male Halfmoon with koi marbling, not an animation.
+Render accepts GitHub snapshots only. Collection output parents must already exist.
 Errors go to stderr and exit 1; invalid usage exits 2.
 Examples: git-koi collect octocat --output snapshot.json
           git-koi render snapshot.json --output-dir koi --body asagi";
@@ -56,7 +59,7 @@ fn main() -> ExitCode {
     match argument_texts.as_slice() {
         [Some("--help")]
         | [
-            Some("collect" | "collect-leetcode" | "render"),
+            Some("collect" | "collect-leetcode" | "render" | "render-betta"),
             Some("--help"),
         ] => {
             println!("{USAGE}");
@@ -80,6 +83,14 @@ fn main() -> ExitCode {
         [Some("collect"), Some(login)] if !login.starts_with('-') => run_collect(login, None),
         [Some("collect"), Some(login), Some("--output"), _] if !login.starts_with('-') => {
             run_collect(login, Some(Path::new(&program_arguments[3])))
+        }
+        [
+            Some("render-betta"),
+            Some(snapshot_path),
+            Some("--output-dir"),
+            _,
+        ] if !snapshot_path.starts_with('-') => {
+            run_render_betta(Path::new(snapshot_path), Path::new(&program_arguments[3]))
         }
         [Some("render"), Some(snapshot_path), Some("--output-dir"), _]
             if !snapshot_path.starts_with('-') =>
@@ -105,6 +116,43 @@ fn main() -> ExitCode {
         _ => {
             eprintln!("{USAGE}");
             ExitCode::from(2)
+        }
+    }
+}
+
+fn run_render_betta(snapshot_path: &Path, directory: &Path) -> ExitCode {
+    let result = (|| -> Result<(), String> {
+        let bytes = fs::read(snapshot_path).map_err(|e| e.to_string())?;
+        let snapshot: LeetCodeSnapshot =
+            serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+        let traits = derive_betta_development(&snapshot).map_err(|e| e.to_string())?;
+        let frame = render_betta(&traits);
+        let files = [
+            ("betta.png", encode_png(&frame).map_err(|e| e.to_string())?),
+            ("betta.svg", encode_svg(&frame).into_bytes()),
+            ("preview.html", betta_preview(&snapshot).into_bytes()),
+            (
+                "traits.json",
+                serde_json::to_vec_pretty(&serde_json::json!({
+                    "identity_seed": traits.identity_seed, "solved": traits.solved,
+                    "growth": traits.growth, "difficulty_shares": traits.difficulty_shares,
+                    "topic_weights": traits.topic_weights,
+                }))
+                .map_err(|e| e.to_string())?,
+            ),
+        ];
+        fs::create_dir_all(directory).map_err(|e| e.to_string())?;
+        for (name, contents) in files {
+            replace_file(&directory.join(name), &contents)?;
+        }
+        println!("Halfmoon male betta: wrote {}", directory.display());
+        Ok(())
+    })();
+    match result {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(error) => {
+            eprintln!("git-koi: {error}");
+            ExitCode::FAILURE
         }
     }
 }

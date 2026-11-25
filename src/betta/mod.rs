@@ -6,3 +6,6 @@ mod render;
 pub use render::render_betta;
 
 mod marble;
+
+mod preview;
+pub use preview::betta_preview;
