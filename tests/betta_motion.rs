@@ -295,20 +295,30 @@ fn membranes_move_visibly_with_the_camera_and_head_held_still() {
 }
 
 #[test]
-fn betta_completes_a_full_circle_without_changing_depth_scale() {
-    let radius_squared = 42_f64.powi(2);
+fn relaxed_glides_keep_the_fish_upright_and_never_squash_its_profile() {
     let first = betta_pose(0, BettaActivity::Unknown, 0.);
-    let mut quadrants = [false; 4];
+    let mut directions = Vec::new();
     for frame in 0..BETTA_FRAMES {
         let pose = betta_pose(frame, BettaActivity::Unknown, 0.);
-        assert!((pose.dx * pose.dx + pose.dy * pose.dy - radius_squared).abs() < 1e-8);
-        assert_eq!(pose.scene_scale, first.scene_scale);
-        quadrants[usize::from(pose.dx < 0.) + 2 * usize::from(pose.dy < 0.)] = true;
-        assert!(
-            pose.pitch.abs() < 0.5,
-            "fish rolls upside down on its circle"
+        assert_eq!(
+            pose.projection.abs(),
+            1.,
+            "the fish is being flattened during a turn"
         );
+        assert_eq!(pose.pitch, 0., "the whole fish is rotating");
+        assert!(pose.dy.abs() <= 10.);
+        assert_eq!(pose.scene_scale, first.scene_scale);
+        directions.push(pose.projection);
     }
-    assert!(quadrants.into_iter().all(|visited| visited));
+    assert!(directions.contains(&1.) && directions.contains(&-1.));
+    let reversals = directions
+        .iter()
+        .zip(directions.iter().cycle().skip(1))
+        .filter(|(a, b)| a != b)
+        .count();
+    assert_eq!(
+        reversals, 2,
+        "direction changes should happen only at the two course ends"
+    );
     assert_eq!(first, betta_pose(BETTA_FRAMES, BettaActivity::Unknown, 0.));
 }

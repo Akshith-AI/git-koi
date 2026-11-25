@@ -61,9 +61,9 @@ pub struct BettaPose {
     pub dx: f64,
     /// Vertical position on the swimming course, in scene pixels.
     pub dy: f64,
-    /// Signed horizontal foreshortening; negative faces left during the return.
+    /// Signed horizontal side profile; negative faces left during the return.
     pub projection: f64,
-    /// Small bank angle in radians, following the direction of travel.
+    /// Bank angle in radians; the relaxed course remains upright at zero.
     pub pitch: f64,
     /// Camera scale that leaves room to swim around the scene.
     pub scene_scale: f64,
@@ -89,11 +89,12 @@ pub fn betta_pose(frame: u32, activity: BettaActivity, flare: f64) -> BettaPose 
         } else {
             0.
         },
-        dx: 42. * course.sin(),
-        dy: 42. * course.cos(),
-        // Hold a readable side view during the glide, then turn edge-on briefly.
-        projection: facing * heading.abs().powf(0.22).max(0.20),
-        pitch: (-42. * course.sin()).atan2(42. * heading.abs() + 8.) * 0.28 * facing,
-        scene_scale: 0.60,
+        dx: 48. * course.sin(),
+        dy: 10. * course.cos(),
+        // Preserve the full upright side profile. Change direction only at the
+        // course ends; do not rotate or flatten the entire fish to suggest a turn.
+        projection: facing,
+        pitch: 0.,
+        scene_scale: 0.66,
     }
 }

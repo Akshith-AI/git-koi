@@ -35,8 +35,9 @@ The koi's growth, coat, and chosen behavior still come from its GitHub snapshot.
 The betta's size, difficulty palette, and topic marbling come from LeetCode.
 Each fish swims in its own lane, with opposite curved courses so the fish stay
 readable without crossing or clipping. The betta turns to face its travel rather
-than sliding backward. In betta-only mode it follows a full circular course,
-with foreshortened turns, gentle banking, and trailing tail and fin waves. The
+than sliding backward. In betta-only mode it follows a shallow back-and-forth
+course, with an upright side profile and trailing tail and fin waves. Direction
+changes at the ends; the whole fish is not rotated or squeezed edge-on. The
 koi's native loop is retimed to the shared four-second loop. It is not assigned
 the betta's activity or growth.
 
