@@ -79,6 +79,27 @@ Reproduce the four images and their synthetic snapshot files:
 cargo run --release --locked --example betta-gallery -- target/betta-gallery
 ```
 
+## Reference anatomy check
+
+The user-provided koi-marble photograph was compared directly against the
+rendered portrait on November 25, 2026. The drawing remains an original
+pixel-art interpretation. Red, ivory and blue come from the reference palette;
+gold and orange were added at the user's subsequent request. The marbling is
+personalized from profile data, not a copy of the photograph's patch layout.
+
+The reference review corrected the previously pointed anal fin to a broader,
+round-cornered outline, narrowed the paired ventral filaments, reduced the
+pectoral fin, and simulated its thin membrane by blending its color with the
+underlying pattern. The dorsal outline now flows more naturally toward the
+caudal fan. Binary output alpha is retained for GIF compatibility; the pectoral
+translucency is a color treatment rather than partial output transparency.
+
+The intended single-tail Halfmoon form is checked against the
+[International Betta Congress longfin Halfmoon standard](https://www.ibcbettas.org/wp-content/uploads/2025/06/IBC-2022-Exhibition-Standards-Book-01-Final.pdf):
+a spread semicircular tail and a broad anal outline, with balanced fins. The
+standard guides silhouette and fin placement; the sprite uses simplified
+pixel-art anatomy. The source photograph remains outside the repository.
+
 ## Validation and remaining work
 
 Verified on November 25, 2026, with Rust 1.88.0 on Apple Silicon macOS:

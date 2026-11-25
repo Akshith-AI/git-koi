@@ -30,16 +30,17 @@ fn render_pose(development: &BettaDevelopment, pose: Option<super::BettaPose>) -
     let dorsal = outline(
         [119., 111.],
         &[
-            [[111., 90.], [117., 56.], [135., 45.]],
-            [[150., 34.], [175., 47.], [185., 75.]],
+            [[110., 90.], [102., 56.], [115., 44.]],
+            [[136., 35.], [166., 47.], [185., 75.]],
             [[194., 91.], [195., 101.], [202., 110.]],
         ],
     );
     let anal = outline(
         [111., 130.],
         &[
-            [[110., 157.], [113., 193.], [132., 211.]],
-            [[146., 220.], [179., 191.], [198., 144.]],
+            [[108., 157.], [113., 190.], [126., 202.]],
+            [[143., 211.], [163., 208.], [176., 196.]],
+            [[188., 180.], [191., 159.], [198., 144.]],
             [[177., 131.], [137., 129.], [111., 130.]],
         ],
     );
@@ -54,24 +55,24 @@ fn render_pose(development: &BettaDevelopment, pose: Option<super::BettaPose>) -
         ],
     );
     let ventral = outline(
-        [197., 142.],
+        [195., 142.],
         &[
-            [[194., 160.], [178., 191.], [165., 205.]],
-            [[173., 182.], [179., 158.], [185., 143.]],
+            [[192., 160.], [177., 192.], [165., 205.]],
+            [[174., 183.], [183., 157.], [189., 143.]],
         ],
     );
     let ventral_back = outline(
         [184., 143.],
         &[
-            [[182., 163.], [164., 191.], [153., 199.]],
-            [[162., 176.], [169., 156.], [176., 142.]],
+            [[181., 164.], [162., 190.], [153., 199.]],
+            [[164., 179.], [173., 157.], [179., 143.]],
         ],
     );
     let pectoral = outline(
         [184., 122.],
         &[
-            [[174., 126.], [160., 147.], [168., 163.]],
-            [[184., 161.], [194., 140.], [184., 122.]],
+            [[176., 128.], [164., 143.], [168., 155.]],
+            [[181., 155.], [191., 138.], [184., 122.]],
         ],
     );
     let mut pixels = vec![[0; 4]; (FRAME_WIDTH_PIXELS * FRAME_WIDTH_PIXELS) as usize];
@@ -107,6 +108,7 @@ fn render_pose(development: &BettaDevelopment, pose: Option<super::BettaPose>) -
                 None
             };
             let mut pigment_point = tail_point;
+            let mut pectoral_underlay = None;
             for (shape, part) in [
                 (&dorsal, Region::Dorsal),
                 (&anal, Region::Anal),
@@ -117,6 +119,10 @@ fn render_pose(development: &BettaDevelopment, pose: Option<super::BettaPose>) -
             ] {
                 let sample = fin_sample(point, part, pose);
                 if contains(shape, sample) {
+                    if matches!(part, Region::Pectoral) {
+                        pectoral_underlay = region
+                            .map(|under| super::marble::color(development, pigment_point, under));
+                    }
                     region = Some(part);
                     pigment_point = sample;
                 }
@@ -134,6 +140,16 @@ fn render_pose(development: &BettaDevelopment, pose: Option<super::BettaPose>) -
             }
             if let Some(region) = region {
                 let mut color = super::marble::color(development, pigment_point, region);
+                if matches!(region, Region::Pectoral) {
+                    if let Some(underlay) = pectoral_underlay {
+                        // Simulate a thin translucent membrane in opaque RGB so GIF
+                        // transparency remains binary and body patches show through.
+                        for axis in 0..3 {
+                            color[axis] = ((u16::from(color[axis]) + 3 * u16::from(underlay[axis]))
+                                / 4) as u8;
+                        }
+                    }
+                }
                 // A dark operculum arc and small upturned mouth distinguish the head.
                 let gill = ((px - 194.) / 10.).powi(2) + ((py - 122.) / 21.).powi(2);
                 if matches!(region, Region::Body) && px < 195. && (0.88..1.08).contains(&gill) {
