@@ -97,14 +97,7 @@ fn render_pose(development: &BettaDevelopment, pose: Option<super::BettaPose>) -
                 point[1] -= stroke * lag.powi(2) * 7. * pose.energy;
             }
             let [px, py] = point;
-            let spread = pose.map_or(1., |p| 0.72 + 0.28 * p.flare);
-            let flutter = pose.map_or(1., |p| {
-                1. + (0.03 * (p.phase * 4. - px * 0.045).sin()
-                    + 0.012 * (p.phase * 8. - px * 0.06).sin())
-                    * p.energy
-            });
-            let fin_point = [px, 126. + (py - 126.) / (spread * flutter)];
-            let tail_point = [113. + (px - 113.) / spread, fin_point[1]];
+            let tail_point = fin_sample(point, Region::Tail, pose);
             let angle = (tail_point[1] - 126.).atan2(tail_point[0] - 113.);
             let radius = (tail_point[0] - 113.).hypot(tail_point[1] - 126.);
             let edge = 86. + 0.9 * (angle * 36.).cos();
@@ -122,11 +115,7 @@ fn render_pose(development: &BettaDevelopment, pose: Option<super::BettaPose>) -
                 (&body, Region::Body),
                 (&pectoral, Region::Pectoral),
             ] {
-                let sample = if matches!(part, Region::Body) {
-                    point
-                } else {
-                    fin_point
-                };
+                let sample = fin_sample(point, part, pose);
                 if contains(shape, sample) {
                     region = Some(part);
                     pigment_point = sample;
@@ -172,6 +161,57 @@ fn render_pose(development: &BettaDevelopment, pose: Option<super::BettaPose>) -
         }
     }
     KoiFrame::from_rgba_pixels(pixels)
+}
+
+// Inverse, root-anchored deformations let each fin move independently while its
+// pigment and rays remain attached to its membrane. Motion grows toward the tips.
+fn fin_sample([x, y]: Point, region: Region, pose: Option<super::BettaPose>) -> Point {
+    let Some(p) = pose else {
+        return [x, y];
+    };
+    let spread = 0.72 + 0.28 * p.flare;
+    let strength = 0.55 + 0.45 * p.energy;
+    let beat = p.phase * 3.;
+    match region {
+        Region::Tail => {
+            let trail = ((113. - x) / 86.).clamp(0., 1.);
+            let pulse = 1. + 0.10 * (beat - 0.9).sin() * strength;
+            [
+                113. + (x - 113.) / spread - 4. * (beat - trail * 2.4).sin() * trail * strength,
+                126. + (y - 126.) / (spread * pulse)
+                    - 14. * (beat - trail * 2.4).sin() * trail.powf(1.3) * strength,
+            ]
+        }
+        Region::Dorsal => {
+            let tip = ((106. - y) / 65.).clamp(0., 1.);
+            [
+                x - 10. * (beat - tip * 2.).sin() * tip * strength,
+                106. + (y - 106.) / (spread * (1. + 0.11 * (beat - tip + 0.7).sin() * strength)),
+            ]
+        }
+        Region::Anal => {
+            let tip = ((y - 140.) / 72.).clamp(0., 1.);
+            [
+                x - 11. * (beat - tip * 2.2 + 1.6).sin() * tip * strength,
+                140. + (y - 140.) / (spread * (1. + 0.12 * (beat - tip + 2.1).sin() * strength)),
+            ]
+        }
+        Region::Ventral => {
+            let tip = ((y - 143.) / 62.).clamp(0., 1.);
+            [
+                x - 8. * (beat - tip * 2.8 + 2.4).sin() * tip * strength,
+                143. + (y - 143.) / spread,
+            ]
+        }
+        Region::Pectoral => {
+            let flap = 0.72 + 0.28 * (p.phase * 6.).cos();
+            [
+                184. + (x - 184.) / flap,
+                122. + (y - 122.) / (0.9 + 0.1 * (p.phase * 6. + 0.8).sin()),
+            ]
+        }
+        Region::Body | Region::Gill => [x, y],
+    }
 }
 
 fn outline(start: Point, curves: &[[Point; 3]]) -> Vec<Point> {

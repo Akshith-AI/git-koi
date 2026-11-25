@@ -65,6 +65,18 @@ pub fn animation_files(
     };
     let stem = if github.is_some() { "pond" } else { "betta" };
     let page = widget_html(&profile.username, github.is_some());
+    // A fixed-camera detail loop makes membrane motion inspectable without turns.
+    let detail_frames: Vec<_> = (0..BETTA_FRAMES)
+        .map(|i| {
+            let mut pose = betta_pose(i, activity, 0.);
+            pose.dx = 0.;
+            pose.dy = 0.;
+            pose.projection = 1.;
+            pose.pitch = 0.;
+            pose.scene_scale = 1.;
+            render_betta_frame(&development, pose)
+        })
+        .collect();
     let manifest = serde_json::json!({
         "schema_version":1,"mode":stem,"username":profile.username,
         "frames":BETTA_FRAMES,"fps":15,"flare_levels":FLARE_LEVELS,
@@ -74,6 +86,10 @@ pub fn animation_files(
         "leetcode_observed_on":profile.observed_on,
     });
     Ok(vec![
+        (
+            "fin-detail.gif".into(),
+            encode_art_gif(&detail_frames).map_err(|e| e.to_string())?,
+        ),
         (
             format!("{stem}.gif"),
             encode_art_gif(&frames[..BETTA_FRAMES as usize]).map_err(|e| e.to_string())?,

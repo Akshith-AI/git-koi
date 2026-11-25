@@ -51,6 +51,7 @@ contains few contributions; a mature GitHub profile produces a larger koi:
 | ----------------------------------- | ------------------------------------------------------------------ |
 | `betta.gif` or `pond.gif`           | Portable 512-square, 60-frame, four-second looping GIF             |
 | `betta.png` / `pond.png` and `.svg` | Fully spread still presentation pose                               |
+| `fin-detail.gif`                    | Fixed-camera betta loop for inspecting independent fin motion      |
 | `sprites.png`                       | Full-color atlas: five flare states, each with 60 native frames    |
 | `widget.js`                         | Local interaction and animation controller                         |
 | `embed.html`                        | Standalone interactive website widget                              |
@@ -62,6 +63,15 @@ colors plus transparency. This approximates colors for GIF export only; the PNG,
 SVG, and website atlas keep full color. The original exact-color GitHub koi
 encoder is unchanged. GIFs swim in a relaxed pose; hover flaring is a website
 feature, not a GIF feature.
+
+The tail membrane sweeps behind the body; dorsal and anal fin tips ripple with
+separate phase delays, the ventral fins trail, and the pectoral fin beats
+faster. Each deformation is anchored at its root, so the fins flex rather than
+moving as a single rigid silhouette. The website includes a “Fin motion
+close-up” link to `fin-detail.gif`, which holds the camera and travel direction
+fixed.
+
+![Fixed-camera close-up of independent fin movement](animation/fin-detail.gif)
 
 The marbling includes ivory, crimson, indigo, tangerine, and gold, with softer
 fin shading. Difficulty influences the base color balance and topics shape
@@ -132,8 +142,8 @@ and endpoint streak values are not reinterpreted as current daily streaks.
 Verified November 25, 2026, on Apple Silicon macOS with Rust 1.88 and headless
 Chrome:
 
-- All 134 Rust tests passed in the release profile, including ten new motion and
-  animation-export tests. Formatting, Clippy with warnings denied, release
+- All 135 Rust tests passed in the release profile, including eleven new motion
+  and animation-export tests. Formatting, Clippy with warnings denied, release
   build, and API documentation with warnings denied passed.
 - Rust tests cover loop closure, bounds at every flare level, activity fallback,
   atlas layout, escaped widget text, safe lane separation, command usage,

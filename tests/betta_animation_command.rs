@@ -47,6 +47,7 @@ fn both_commands_export_looping_gifs_and_complete_widget_bundles() {
         assert_eq!(count, 60);
         assert_eq!(duration, 400);
         for name in [
+            "fin-detail.gif",
             "sprites.png",
             "embed.html",
             "preview.html",

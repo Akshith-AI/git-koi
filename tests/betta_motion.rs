@@ -218,3 +218,78 @@ fn koi_marbling_contains_visible_gold_and_tangerine_patches() {
     assert!(gold > 50, "yellow/gold patches are missing: {gold}");
     assert!(orange > 50, "orange patches are missing: {orange}");
 }
+
+#[test]
+fn membranes_move_visibly_with_the_camera_and_head_held_still() {
+    let mut profile = snapshot();
+    profile.solved.all = 3000;
+    profile.solved.easy = 600;
+    profile.solved.medium = 1400;
+    profile.solved.hard = 1000;
+    let traits = derive_betta_development(&profile).unwrap();
+    let fixed = |frame| {
+        let mut pose = betta_pose(frame, BettaActivity::Unknown, 0.);
+        pose.dx = 0.;
+        pose.dy = 0.;
+        pose.projection = 1.;
+        pose.pitch = 0.;
+        pose.scene_scale = 1.;
+        render_betta_frame(&traits, pose)
+    };
+    let a = fixed(0);
+    let b = fixed(10);
+    let alpha_changes = |bounds: [usize; 4]| {
+        let mut count = 0;
+        for y in bounds[1]..bounds[3] {
+            for x in bounds[0]..bounds[2] {
+                let i = (y * 256 + x) * 4;
+                if a.as_rgba_bytes()[i + 3] != b.as_rgba_bytes()[i + 3] {
+                    count += 1;
+                }
+            }
+        }
+        count
+    };
+    assert!(
+        alpha_changes([15, 40, 105, 220]) > 150,
+        "tail outline barely moves"
+    );
+    assert!(
+        alpha_changes([105, 25, 195, 95]) > 50,
+        "dorsal outline barely moves"
+    );
+    assert!(
+        alpha_changes([105, 155, 195, 235]) > 80,
+        "anal outline barely moves"
+    );
+    let mut pectoral_changes = 0;
+    for y in 130..163 {
+        for x in 163..190 {
+            let i = (y * 256 + x) * 4;
+            if a.as_rgba_bytes()[i..i + 4] != b.as_rgba_bytes()[i..i + 4] {
+                pectoral_changes += 1;
+            }
+        }
+    }
+    // Sample another phase for the faster pectoral beat (frame 10 is a full beat).
+    let c = fixed(5);
+    for y in 130..163 {
+        for x in 163..190 {
+            let i = (y * 256 + x) * 4;
+            if a.as_rgba_bytes()[i..i + 4] != c.as_rgba_bytes()[i..i + 4] {
+                pectoral_changes += 1;
+            }
+        }
+    }
+    assert!(pectoral_changes > 100, "pectoral fin does not flap");
+    for y in 109..126 {
+        for x in 207..223 {
+            let i = (y * 256 + x) * 4;
+            assert_eq!(
+                &a.as_rgba_bytes()[i..i + 4],
+                &b.as_rgba_bytes()[i..i + 4],
+                "head moves during the fixed-camera check"
+            );
+        }
+    }
+}
