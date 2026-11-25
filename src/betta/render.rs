@@ -10,12 +10,22 @@ pub(super) enum Region {
     Ventral,
     Body,
     Pectoral,
+    Gill,
 }
 
 /// Draw a right-facing male Halfmoon betta in a fully spread presentation pose.
 /// The caudal fin is a 180-degree fan. All growth stages retain the same anatomy.
 /// Output is a transparent 256-square native frame, compatible with existing encoders.
 pub fn render_betta(development: &BettaDevelopment) -> KoiFrame {
+    render_pose(development, None)
+}
+
+/// Render a swimming pose with fins and gill covers driven by the flare state.
+pub fn render_betta_frame(development: &BettaDevelopment, pose: super::BettaPose) -> KoiFrame {
+    render_pose(development, Some(pose))
+}
+
+fn render_pose(development: &BettaDevelopment, pose: Option<super::BettaPose>) -> KoiFrame {
     let scale = 0.64 + 0.36 * development.growth;
     let dorsal = outline(
         [119., 111.],
@@ -67,19 +77,32 @@ pub fn render_betta(development: &BettaDevelopment) -> KoiFrame {
     let mut pixels = vec![[0; 4]; (FRAME_WIDTH_PIXELS * FRAME_WIDTH_PIXELS) as usize];
     for y in 0..FRAME_WIDTH_PIXELS {
         for x in 0..FRAME_WIDTH_PIXELS {
-            let point = [
+            let mut point = [
                 (f64::from(x) + 0.5 - 128.) / scale + 128.,
                 (f64::from(y) + 0.5 - 128.) / scale + 128.,
             ];
+            if let Some(pose) = pose {
+                point[0] -= pose.dx;
+                point[1] -= pose.dy;
+                let lag = ((160. - point[0]) / 130.).clamp(0., 1.);
+                point[1] -= (pose.phase * 2. - lag * 2.5).sin() * lag * 5. * pose.energy;
+            }
             let [px, py] = point;
-            let angle = (py - 126.).atan2(px - 113.);
-            let radius = (px - 113.).hypot(py - 126.);
+            let spread = pose.map_or(1., |p| 0.72 + 0.28 * p.flare);
+            let flutter = pose.map_or(1., |p| {
+                1. + 0.018 * (p.phase * 3. - px * 0.03).sin() * p.energy
+            });
+            let fin_point = [px, 126. + (py - 126.) / (spread * flutter)];
+            let tail_point = [113. + (px - 113.) / spread, fin_point[1]];
+            let angle = (tail_point[1] - 126.).atan2(tail_point[0] - 113.);
+            let radius = (tail_point[0] - 113.).hypot(tail_point[1] - 126.);
             let edge = 86. + 0.9 * (angle * 36.).cos();
             let mut region = if px <= 113. && radius < edge {
                 Some(Region::Tail)
             } else {
                 None
             };
+            let mut pigment_point = tail_point;
             for (shape, part) in [
                 (&dorsal, Region::Dorsal),
                 (&anal, Region::Anal),
@@ -88,12 +111,29 @@ pub fn render_betta(development: &BettaDevelopment) -> KoiFrame {
                 (&body, Region::Body),
                 (&pectoral, Region::Pectoral),
             ] {
-                if contains(shape, point) {
+                let sample = if matches!(part, Region::Body) {
+                    point
+                } else {
+                    fin_point
+                };
+                if contains(shape, sample) {
                     region = Some(part);
+                    pigment_point = sample;
+                }
+            }
+            if let Some(pose) = pose {
+                let beard = [
+                    [192., 132.],
+                    [201., 141.],
+                    [187., 142. + 16. * pose.flare],
+                    [182., 142.],
+                ];
+                if pose.flare > 0.05 && contains(&beard, point) {
+                    region = Some(Region::Gill);
                 }
             }
             if let Some(region) = region {
-                let mut color = super::marble::color(development, point, region);
+                let mut color = super::marble::color(development, pigment_point, region);
                 // A dark operculum arc and small upturned mouth distinguish the head.
                 let gill = ((px - 194.) / 10.).powi(2) + ((py - 122.) / 21.).powi(2);
                 if matches!(region, Region::Body) && px < 195. && (0.88..1.08).contains(&gill) {

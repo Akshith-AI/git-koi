@@ -7,7 +7,7 @@ use std::{env, fs};
 
 use chrono::{DateTime, NaiveDate};
 use git_koi::behavior::{Behavior, select_behavior};
-use git_koi::betta::{betta_preview, derive_betta_development, render_betta};
+use git_koi::betta::{animation_files, betta_preview, derive_betta_development, render_betta};
 use git_koi::coat::KoiBody;
 use git_koi::collect::{GhCli, collect_account_snapshot};
 use git_koi::history::AccountSnapshot;
@@ -19,6 +19,8 @@ use git_koi::render::{KoiFrame, render_koi, render_swim_frame};
 
 const USAGE: &str = "Usage: git-koi collect LOGIN [--output FILE]
        git-koi collect-leetcode USERNAME [--output FILE]
+       git-koi animate-betta LEETCODE_SNAPSHOT --output-dir DIR
+       git-koi animate-pond GITHUB_SNAPSHOT LEETCODE_SNAPSHOT --output-dir DIR
        git-koi render-betta SNAPSHOT --output-dir DIR
        git-koi render SNAPSHOT --output-dir DIR [--body BODY]
        git-koi --help | --version
@@ -36,6 +38,9 @@ No login is needed. Optional unavailable fields include a diagnostic instead of 
 Render-betta reads a LeetCode snapshot and writes betta.png, betta.svg, traits.json,
 and preview.html. It draws a still male Halfmoon with koi marbling, not an animation.
 Render accepts GitHub snapshots only. Collection output parents must already exist.
+Animate-betta exports a looping GIF and an interactive website widget.
+Animate-pond adds an independently developed GitHub koi. Copy the complete output
+folder to a website; embed.html supports hover, focus, tap, and reduced motion.
 Errors go to stderr and exit 1; invalid usage exits 2.
 Examples: git-koi collect octocat --output snapshot.json
           git-koi render snapshot.json --output-dir koi --body asagi";
@@ -59,7 +64,10 @@ fn main() -> ExitCode {
     match argument_texts.as_slice() {
         [Some("--help")]
         | [
-            Some("collect" | "collect-leetcode" | "render" | "render-betta"),
+            Some(
+                "collect" | "collect-leetcode" | "render" | "render-betta" | "animate-betta"
+                | "animate-pond",
+            ),
             Some("--help"),
         ] => {
             println!("{USAGE}");
@@ -84,6 +92,25 @@ fn main() -> ExitCode {
         [Some("collect"), Some(login), Some("--output"), _] if !login.starts_with('-') => {
             run_collect(login, Some(Path::new(&program_arguments[3])))
         }
+        [
+            Some("animate-betta"),
+            Some(profile),
+            Some("--output-dir"),
+            _,
+        ] if !profile.starts_with('-') => {
+            run_animation(Path::new(profile), None, Path::new(&program_arguments[3]))
+        }
+        [
+            Some("animate-pond"),
+            Some(github),
+            Some(profile),
+            Some("--output-dir"),
+            _,
+        ] if !github.starts_with('-') && !profile.starts_with('-') => run_animation(
+            Path::new(profile),
+            Some(Path::new(github)),
+            Path::new(&program_arguments[4]),
+        ),
         [
             Some("render-betta"),
             Some(snapshot_path),
@@ -116,6 +143,38 @@ fn main() -> ExitCode {
         _ => {
             eprintln!("{USAGE}");
             ExitCode::from(2)
+        }
+    }
+}
+
+fn run_animation(profile_path: &Path, github_path: Option<&Path>, directory: &Path) -> ExitCode {
+    let result = (|| -> Result<(), String> {
+        let profile: LeetCodeSnapshot =
+            serde_json::from_slice(&fs::read(profile_path).map_err(|e| e.to_string())?)
+                .map_err(|e| e.to_string())?;
+        let github: Option<AccountSnapshot> = github_path
+            .map(|path| {
+                serde_json::from_slice(&fs::read(path).map_err(|e| e.to_string())?)
+                    .map_err(|e| e.to_string())
+            })
+            .transpose()?;
+        let files = animation_files(&profile, github.as_ref())?;
+        fs::create_dir_all(directory).map_err(|e| e.to_string())?;
+        for (name, contents) in files {
+            replace_file(&directory.join(name), &contents)?;
+        }
+        println!(
+            "Animated {}: wrote {}",
+            if github.is_some() { "pond" } else { "betta" },
+            directory.display()
+        );
+        Ok(())
+    })();
+    match result {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(error) => {
+            eprintln!("git-koi: {error}");
+            ExitCode::FAILURE
         }
     }
 }

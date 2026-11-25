@@ -42,6 +42,10 @@ pub(super) fn color(development: &BettaDevelopment, [x, y]: [f64; 2], region: Re
     let angle = (y - 126.).atan2(x - 113.);
     let radius = (x - 113.).hypot(y - 126.);
     let mut shade = match region {
+        Region::Gill => {
+            base = [44., 28., 49.];
+            1.
+        }
         Region::Body => {
             let belly = ((y - 118.) / 31.).abs().min(1.);
             let scales = ((x + ((y / 3.).floor() % 2.) * 2.) * 1.55).cos() * (y * 2.1).cos();
