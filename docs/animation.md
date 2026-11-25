@@ -35,10 +35,10 @@ The koi's growth, coat, and chosen behavior still come from its GitHub snapshot.
 The betta's size, difficulty palette, and topic marbling come from LeetCode.
 Each fish swims in its own lane, with opposite curved courses so the fish stay
 readable without crossing or clipping. The betta turns to face its travel rather
-than sliding backward. In betta-only mode it follows a wider oval course, with
-foreshortened turns, gentle banking, and trailing tail and fin waves. The koi's
-native loop is retimed to the shared four-second loop. It is not assigned the
-betta's activity or growth.
+than sliding backward. In betta-only mode it follows a full circular course,
+with foreshortened turns, gentle banking, and trailing tail and fin waves. The
+koi's native loop is retimed to the shared four-second loop. It is not assigned
+the betta's activity or growth.
 
 This synthetic example has a juvenile GitHub koi because the inherited fixture
 contains few contributions; a mature GitHub profile produces a larger koi:
@@ -142,7 +142,7 @@ and endpoint streak values are not reinterpreted as current daily streaks.
 Verified November 25, 2026, on Apple Silicon macOS with Rust 1.88 and headless
 Chrome:
 
-- All 135 Rust tests passed in the release profile, including eleven new motion
+- All 136 Rust tests passed in the release profile, including twelve new motion
   and animation-export tests. Formatting, Clippy with warnings denied, release
   build, and API documentation with warnings denied passed.
 - Rust tests cover loop closure, bounds at every flare level, activity fallback,

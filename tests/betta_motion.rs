@@ -19,7 +19,7 @@ fn poses_wrap_and_opening_is_bounded() {
         );
         let first = betta_pose(0, activity, 0.);
         let last = betta_pose(BETTA_FRAMES - 1, activity, 0.);
-        assert!((first.dx - last.dx).abs() < 7. && (first.dy - last.dy).abs() < 0.5);
+        assert!((first.dx - last.dx).abs() < 7. && (first.dy - last.dy).abs() < 0.6);
     }
     assert_eq!(betta_pose(0, BettaActivity::Unknown, f64::NAN).flare, 0.);
     assert_eq!(betta_pose(0, BettaActivity::Unknown, 99.).flare, 1.);
@@ -292,4 +292,23 @@ fn membranes_move_visibly_with_the_camera_and_head_held_still() {
             );
         }
     }
+}
+
+#[test]
+fn betta_completes_a_full_circle_without_changing_depth_scale() {
+    let radius_squared = 42_f64.powi(2);
+    let first = betta_pose(0, BettaActivity::Unknown, 0.);
+    let mut quadrants = [false; 4];
+    for frame in 0..BETTA_FRAMES {
+        let pose = betta_pose(frame, BettaActivity::Unknown, 0.);
+        assert!((pose.dx * pose.dx + pose.dy * pose.dy - radius_squared).abs() < 1e-8);
+        assert_eq!(pose.scene_scale, first.scene_scale);
+        quadrants[usize::from(pose.dx < 0.) + 2 * usize::from(pose.dy < 0.)] = true;
+        assert!(
+            pose.pitch.abs() < 0.5,
+            "fish rolls upside down on its circle"
+        );
+    }
+    assert!(quadrants.into_iter().all(|visited| visited));
+    assert_eq!(first, betta_pose(BETTA_FRAMES, BettaActivity::Unknown, 0.));
 }

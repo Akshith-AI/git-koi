@@ -89,11 +89,11 @@ pub fn betta_pose(frame: u32, activity: BettaActivity, flare: f64) -> BettaPose 
         } else {
             0.
         },
-        dx: 48. * course.sin(),
-        dy: 18. * course.cos(),
+        dx: 42. * course.sin(),
+        dy: 42. * course.cos(),
         // Hold a readable side view during the glide, then turn edge-on briefly.
         projection: facing * heading.abs().powf(0.22).max(0.20),
-        pitch: (-18. * course.sin()).atan2(48. * heading.abs() + 8.) * 0.28 * facing,
-        scene_scale: 0.66,
+        pitch: (-42. * course.sin()).atan2(42. * heading.abs() + 8.) * 0.28 * facing,
+        scene_scale: 0.60,
     }
 }

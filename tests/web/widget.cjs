@@ -61,15 +61,33 @@ const server = http.createServer((request, response) => {
         (frame) => document.querySelector("canvas").dataset.frame !== frame,
         first,
       );
-      const hit = await canvas.evaluate((canvas) => {
+      const hit = await canvas.evaluate((canvas, mode) => {
         const context = canvas.getContext("2d");
         const pixels = context.getImageData(0, 0, 256, 256).data;
-        for (let y = 60; y < 125; y++)
-          for (let x = 80; x < 220; x++) {
-            if (pixels[(y * 256 + x) * 4 + 3] > 0) return { x, y };
+        const limit = mode === "pond" ? 127 : 256;
+        const opaque = (x, y) => pixels[(y * 256 + x) * 4 + 3] > 0;
+        const points = [];
+        for (let y = 6; y < limit - 6; y++) {
+          for (let x = 6; x < 250; x++) {
+            if (opaque(x, y)) points.push({ x, y });
           }
-        throw new Error("No betta pixels in hit area");
-      });
+        }
+        if (!points.length) throw new Error("No betta pixels in hit area");
+        const meanX = points.reduce((sum, p) => sum + p.x, 0) / points.length;
+        const meanY = points.reduce((sum, p) => sum + p.y, 0) / points.length;
+        const interior = points.filter(({ x, y }) =>
+          [-5, 0, 5].every((dy) =>
+            [-5, 0, 5].every((dx) => opaque(x + dx, y + dy)),
+          ),
+        );
+        // Aim inside the moving fish, not at a brittle first edge pixel.
+        return (interior.length ? interior : points).sort(
+          (a, b) =>
+            (a.x - meanX) ** 2 +
+            (a.y - meanY) ** 2 -
+            ((b.x - meanX) ** 2 + (b.y - meanY) ** 2),
+        )[0];
+      }, mode);
       const bounds = await canvas.boundingBox();
       await page.mouse.move(
         bounds.x + (hit.x / 256) * bounds.width,
