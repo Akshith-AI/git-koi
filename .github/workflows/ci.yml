@@ -23,8 +23,8 @@ jobs:
         run: cargo +stable fmt --all -- --check
       - name: Lint
         run: cargo +stable clippy --locked --all-targets -- -D warnings
-      - name: Test
-        run: cargo +stable test --locked
+      - name: Test production rendering
+        run: cargo +stable test --release --locked
       - name: Build
         run: cargo +stable build --release --locked
       - name: Document
