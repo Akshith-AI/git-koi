@@ -12,12 +12,12 @@ workflow foundation are the work of the upstream project and its contributors.
 The Git history preserves their authorship.
 
 This fork adds a public LeetCode profile collector, snapshot model, validation,
-and tests. A male Halfmoon betta with koi marbling, a combined GitHub koi /
-LeetCode betta pond, and interactive website flaring are planned extensions.
-Their implementation status is tracked in docs/roadmap.md.
+and tests. It also adds original male Halfmoon betta geometry and procedural koi
+marbling, plus still PNG/SVG exports and a local preview. Betta animation, a
+combined GitHub koi / LeetCode betta pond, and interactive website flaring are
+planned extensions. Their implementation status is tracked in docs/roadmap.md.
 
 The reference photograph informs the intended fish anatomy and color style; it
-is not included as a project asset. Any new betta graphics will be drawn by the
-renderer.
+is not included as a project asset. Betta graphics are drawn by the renderer.
 
 This notice supplements, and does not replace, the original MIT license.

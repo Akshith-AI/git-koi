@@ -11,9 +11,10 @@ Two output modes are planned:
 - **Pond:** the LeetCode betta alongside a GitHub koi, each developing from its
   own account's activity.
 
-**Current status:** the GitHub koi generator and LeetCode profile collector are
-available. The betta renderer, shared pond, and interactive website embed are
-not implemented yet. The executable and Rust package are still named `git-koi`.
+**Current status:** the GitHub koi generator, LeetCode profile collector, and
+male Halfmoon betta still renderer are available. Betta animation, the shared
+pond, and interactive website embed are not implemented yet. The executable and
+Rust package are still named `git-koi`.
 
 Collect a public LeetCode profile from this checkout:
 
@@ -22,8 +23,15 @@ cargo run --release --locked -- collect-leetcode YOUR_LEETCODE_USERNAME --output
 ```
 
 See the [LeetCode guide](docs/leetcode.md) for requirements, field meanings,
-topic overlap, and unavailable-data handling. This creates data for the upcoming
-betta renderer; it does not generate a betta GIF yet.
+topic overlap, and unavailable-data handling. Draw a still portrait from that
+data:
+
+```sh
+cargo run --release --locked -- render-betta target/leetcode.json --output-dir target/my-betta
+```
+
+See the [betta guide and gallery](docs/betta.md) for the visual legend and
+sample portraits. This generates PNG/SVG stills, not an animated betta GIF.
 
 See the [roadmap](docs/roadmap.md) for the five implementation stages and the
 [local baseline guide](docs/local-baseline.md) for a sample render without

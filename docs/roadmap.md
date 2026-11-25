@@ -24,7 +24,7 @@ accounts; reject unknown accounts without overwriting existing output. Document
 the limits of each metric. See [the collection guide](leetcode.md) for commands,
 coverage, and the verification record.
 
-## 3. Male Halfmoon betta renderer
+## 3. Male Halfmoon betta renderer — complete
 
 Create a distinct compact betta body, broad 180-degree fan-shaped caudal fin,
 flowing dorsal and anal fins, and slender paired ventral fins. Use irregular koi
@@ -38,7 +38,8 @@ GitHub's contribution scale. Draw original graphics; do not redistribute the
 reference photograph.
 
 Acceptance: deterministic still images across representative progress levels,
-with a documented legend for the visual traits.
+with a documented legend for the visual traits. See the [betta guide](betta.md)
+for commands, reproducible examples, and verification.
 
 ## 4. Animation and two output modes
 

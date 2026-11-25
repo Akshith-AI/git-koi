@@ -1,8 +1,8 @@
 # LeetCode profile collection
 
-Stage 2 adds a public LeetCode data source for the upcoming betta renderer. It
-collects JSON; it does not draw the betta yet. The GitHub koi generator
-continues to work independently.
+Stage 2 adds a public LeetCode data source. It collects JSON for the
+[stage 3 betta portrait renderer](betta.md). The GitHub koi generator continues
+to work independently.
 
 ## Collect a profile
 
@@ -26,8 +26,8 @@ unknown account, malformed required response, or output failure exits 1. Invalid
 command syntax exits 2. Existing output files are replaced only after successful
 collection and serialization, using a sibling temporary file.
 
-The `render` command still accepts GitHub snapshots only. Do not feed this JSON
-to it; betta geometry and animation are stages 3 and 4.
+The `render` command still accepts GitHub snapshots only. Use `render-betta` for
+a still portrait from this JSON. Betta animation remains stage 4.
 
 ## Snapshot fields and their meaning
 
