@@ -23,10 +23,10 @@ pub fn parse_topics(response: &Value) -> Result<Vec<TopicCount>, LeetCodeError> 
                 name: string(row, "tagName")?.into(),
                 solved: unsigned(row, "problemsSolved")?,
             };
-            if let Some(previous) = topics.insert(topic.slug.clone(), topic.clone()) {
-                if previous != topic {
-                    return Err(invalid("conflicting topic counts"));
-                }
+            if let Some(previous) = topics.insert(topic.slug.clone(), topic.clone())
+                && previous != topic
+            {
+                return Err(invalid("conflicting topic counts"));
             }
         }
     }

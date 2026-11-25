@@ -23,13 +23,13 @@ pub fn betta_activity(snapshot: &LeetCodeSnapshot) -> BettaActivity {
     let Some(start) = snapshot.observed_on.checked_sub_days(Days::new(6)) else {
         return BettaActivity::Unknown;
     };
-    if let Availability::Available { data } = &snapshot.recent_accepted {
-        if data.iter().any(|entry| {
+    if let Availability::Available { data } = &snapshot.recent_accepted
+        && data.iter().any(|entry| {
             chrono::DateTime::from_timestamp(entry.timestamp, 0)
                 .is_some_and(|stamp| (start..=snapshot.observed_on).contains(&stamp.date_naive()))
-        }) {
-            return BettaActivity::Active;
-        }
+        })
+    {
+        return BettaActivity::Active;
     }
     if let Availability::Available { data } = &snapshot.calendar {
         use chrono::Datelike;

@@ -140,14 +140,13 @@ fn render_pose(development: &BettaDevelopment, pose: Option<super::BettaPose>) -
             }
             if let Some(region) = region {
                 let mut color = super::marble::color(development, pigment_point, region);
-                if matches!(region, Region::Pectoral) {
-                    if let Some(underlay) = pectoral_underlay {
-                        // Simulate a thin translucent membrane in opaque RGB so GIF
-                        // transparency remains binary and body patches show through.
-                        for axis in 0..3 {
-                            color[axis] = ((u16::from(color[axis]) + 3 * u16::from(underlay[axis]))
-                                / 4) as u8;
-                        }
+                if matches!(region, Region::Pectoral)
+                    && let Some(underlay) = pectoral_underlay
+                {
+                    // Simulate a thin translucent membrane with opaque RGB.
+                    for axis in 0..3 {
+                        color[axis] =
+                            ((u16::from(color[axis]) + 3 * u16::from(underlay[axis])) / 4) as u8;
                     }
                 }
                 // A dark operculum arc and small upturned mouth distinguish the head.

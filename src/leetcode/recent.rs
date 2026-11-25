@@ -40,10 +40,10 @@ pub fn parse_recent(
             slug: string(row, "titleSlug")?.into(),
             timestamp,
         };
-        if let Some(previous) = submissions.insert(submission.id.clone(), submission.clone()) {
-            if previous != submission {
-                return Err(invalid("conflicting accepted submission IDs"));
-            }
+        if let Some(previous) = submissions.insert(submission.id.clone(), submission.clone())
+            && previous != submission
+        {
+            return Err(invalid("conflicting accepted submission IDs"));
         }
     }
     let mut submissions: Vec<_> = submissions.into_values().collect();

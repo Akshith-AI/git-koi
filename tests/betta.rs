@@ -83,7 +83,7 @@ fn all_growth_stages_keep_fins_inside_transparent_canvas() {
         let pixels = image(&profile);
         assert_eq!(pixels.len(), 256 * 256 * 4);
         let mut area = 0;
-        for (i, pixel) in pixels.chunks_exact(4).enumerate() {
+        for (i, pixel) in pixels.as_chunks::<4>().0.iter().enumerate() {
             assert!(pixel[3] == 0 || pixel[3] == 255);
             if pixel[3] != 0 {
                 let (x, y) = (i % 256, i / 256);
@@ -124,11 +124,20 @@ fn difficulty_changes_palette_without_changing_silhouette() {
     change_solves(&mut medium, [0, 709, 0]);
     let a = image(&easy);
     let b = image(&medium);
-    let alpha = |pixels: &[u8]| pixels.chunks_exact(4).map(|p| p[3]).collect::<Vec<_>>();
+    let alpha = |pixels: &[u8]| {
+        pixels
+            .as_chunks::<4>()
+            .0
+            .iter()
+            .map(|p| p[3])
+            .collect::<Vec<_>>()
+    };
     assert_eq!(alpha(&a), alpha(&b));
     let red_count = |pixels: &[u8]| {
         pixels
-            .chunks_exact(4)
+            .as_chunks::<4>()
+            .0
+            .iter()
             .filter(|p| p[3] == 255 && u16::from(p[0]) > u16::from(p[2]) * 2)
             .count()
     };

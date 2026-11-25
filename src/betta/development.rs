@@ -45,10 +45,10 @@ pub fn derive_betta_development(
                 if topic.slug.is_empty() || topic.name.is_empty() || topic.solved > counts.all {
                     return Err(invalid("invalid topic observation"));
                 }
-                if let Some(previous) = seen.insert(&topic.slug, topic) {
-                    if previous != topic {
-                        return Err(invalid("conflicting topic observations"));
-                    }
+                if let Some(previous) = seen.insert(&topic.slug, topic)
+                    && previous != topic
+                {
+                    return Err(invalid("conflicting topic observations"));
                 }
             }
             topic_weights(data)

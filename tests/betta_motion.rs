@@ -57,7 +57,7 @@ fn all_flare_levels_animate_without_clipping_and_opening_adds_fin_area() {
                 &traits,
                 betta_pose(frame, BettaActivity::Active, f64::from(level) / 4.),
             );
-            for (i, p) in image.as_rgba_bytes().chunks_exact(4).enumerate() {
+            for (i, p) in image.as_rgba_bytes().as_chunks::<4>().0.iter().enumerate() {
                 if p[3] > 0 {
                     assert!(i % 256 > 3 && i % 256 < 252 && i / 256 > 3 && i / 256 < 252);
                     area += 1;
@@ -94,7 +94,7 @@ fn pond_lanes_are_distinct_and_scene_wraps() {
     assert_eq!(scene, compose_pond(&betta, &koi, BETTA_FRAMES));
     let mut upper = 0;
     let mut lower = 0;
-    for (i, p) in scene.as_rgba_bytes().chunks_exact(4).enumerate() {
+    for (i, p) in scene.as_rgba_bytes().as_chunks::<4>().0.iter().enumerate() {
         if p[3] > 0 {
             if i / 256 < 127 {
                 upper += 1;
@@ -141,13 +141,13 @@ fn maximum_size_active_flare_and_pond_keep_safe_margins() {
     let traits = derive_betta_development(&profile).unwrap();
     for frame in (0..BETTA_FRAMES).step_by(5) {
         let fish = render_betta_frame(&traits, betta_pose(frame, BettaActivity::Active, 1.));
-        for (i, p) in fish.as_rgba_bytes().chunks_exact(4).enumerate() {
+        for (i, p) in fish.as_rgba_bytes().as_chunks::<4>().0.iter().enumerate() {
             if p[3] > 0 {
                 assert!(i % 256 > 4 && i % 256 < 251 && i / 256 > 4 && i / 256 < 251);
             }
         }
         let scene = compose_pond(&fish, &fish, frame);
-        for (i, p) in scene.as_rgba_bytes().chunks_exact(4).enumerate() {
+        for (i, p) in scene.as_rgba_bytes().as_chunks::<4>().0.iter().enumerate() {
             if p[3] > 0 {
                 assert!(i % 256 > 2 && i % 256 < 253 && i / 256 > 2 && i / 256 < 253);
             }
@@ -164,7 +164,7 @@ fn swimming_travels_across_the_scene_and_faces_its_direction() {
         let image = render_betta_frame(&traits, pose);
         let mut sum = [0_usize; 2];
         let mut count = 0;
-        for (i, pixel) in image.as_rgba_bytes().chunks_exact(4).enumerate() {
+        for (i, pixel) in image.as_rgba_bytes().as_chunks::<4>().0.iter().enumerate() {
             if pixel[3] > 0 {
                 sum[0] += i % 256;
                 sum[1] += i / 256;
@@ -205,7 +205,9 @@ fn koi_marbling_contains_visible_gold_and_tangerine_patches() {
     let mut orange = 0;
     for p in image
         .as_rgba_bytes()
-        .chunks_exact(4)
+        .as_chunks::<4>()
+        .0
+        .iter()
         .filter(|p| p[3] == 255)
     {
         if p[0] > 160 && p[1] > 125 && p[2] < 110 && f64::from(p[1]) / f64::from(p[0]) > 0.65 {

@@ -11,14 +11,22 @@ pub fn encode_art_gif(frames: &[KoiFrame]) -> Result<Vec<u8>, GifEncodingError> 
 
 fn quantize(frame: &KoiFrame) -> KoiFrame {
     let mut histogram = BTreeMap::<[u8; 3], usize>::new();
-    for p in frame.as_rgba_bytes().chunks_exact(4).filter(|p| p[3] != 0) {
+    for p in frame
+        .as_rgba_bytes()
+        .as_chunks::<4>()
+        .0
+        .iter()
+        .filter(|p| p[3] != 0)
+    {
         *histogram.entry([p[0], p[1], p[2]]).or_default() += 1;
     }
     if histogram.len() <= 255 {
         return KoiFrame::from_rgba_pixels(
             frame
                 .as_rgba_bytes()
-                .chunks_exact(4)
+                .as_chunks::<4>()
+                .0
+                .iter()
                 .map(|p| [p[0], p[1], p[2], p[3]])
                 .collect(),
         );
@@ -74,7 +82,9 @@ fn quantize(frame: &KoiFrame) -> KoiFrame {
     KoiFrame::from_rgba_pixels(
         frame
             .as_rgba_bytes()
-            .chunks_exact(4)
+            .as_chunks::<4>()
+            .0
+            .iter()
             .map(|p| {
                 if p[3] == 0 {
                     [0; 4]
