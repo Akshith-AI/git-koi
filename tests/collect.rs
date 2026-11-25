@@ -4,13 +4,13 @@ use std::fs;
 use std::process::Command;
 
 use chrono::{Datelike, Days, NaiveDate, Weekday};
-use git_koi::coat::KoiBody;
-use git_koi::collect::{CollectionError, GraphqlClient, collect_account_snapshot};
-use git_koi::history::{
+use ltkoi::coat::KoiBody;
+use ltkoi::collect::{CollectionError, GraphqlClient, collect_account_snapshot};
+use ltkoi::history::{
     ContributionHistoryError, LanguageColor, calculate_language_shares, summarize_contributions,
 };
-use git_koi::koi::derive_koi_development;
-use git_koi::render::render_koi;
+use ltkoi::koi::derive_koi_development;
+use ltkoi::render::render_koi;
 use serde_json::{Value, json};
 
 const LOGIN: &str = "synthetic-koi";
@@ -231,11 +231,11 @@ fn command_line_usage_errors_exit_two_and_help_exits_zero() {
         &["collect", "--output", "x"],
         &["render"],
     ] {
-        let command_output = run_git_koi(invalid_arguments, None);
+        let command_output = run_ltkoi(invalid_arguments, None);
         assert_eq!(command_output.status.code(), Some(2));
         assert!(String::from_utf8_lossy(&command_output.stderr).starts_with("Usage:"));
     }
-    let help_output = run_git_koi(&["--help"], None);
+    let help_output = run_ltkoi(&["--help"], None);
     assert_eq!(help_output.status.code(), Some(0));
     assert!(String::from_utf8_lossy(&help_output.stdout).contains("GH_TOKEN"));
 }
@@ -249,7 +249,7 @@ fn collection_failure_exits_one_and_keeps_the_previous_snapshot() {
     let output_path = scratch_directory.join("snapshot.json");
     fs::write(&output_path, "previous snapshot\n").unwrap();
 
-    let command_output = run_git_koi(
+    let command_output = run_ltkoi(
         &[
             "collect",
             "octocat",
@@ -376,11 +376,11 @@ fn date(text: &str) -> NaiveDate {
     NaiveDate::parse_from_str(text, "%Y-%m-%d").unwrap()
 }
 
-fn run_git_koi(arguments: &[&str], path_override: Option<&str>) -> std::process::Output {
-    let mut git_koi = Command::new(env!("CARGO_BIN_EXE_git-koi"));
-    git_koi.args(arguments);
+fn run_ltkoi(arguments: &[&str], path_override: Option<&str>) -> std::process::Output {
+    let mut ltkoi = Command::new(env!("CARGO_BIN_EXE_ltkoi"));
+    ltkoi.args(arguments);
     if let Some(path_override) = path_override {
-        git_koi.env("PATH", path_override);
+        ltkoi.env("PATH", path_override);
     }
-    git_koi.output().unwrap()
+    ltkoi.output().unwrap()
 }

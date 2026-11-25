@@ -6,24 +6,24 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use std::{env, fs};
 
 use chrono::{DateTime, NaiveDate};
-use git_koi::behavior::{Behavior, select_behavior};
-use git_koi::betta::{animation_files, betta_preview, derive_betta_development, render_betta};
-use git_koi::coat::KoiBody;
-use git_koi::collect::{GhCli, collect_account_snapshot};
-use git_koi::history::AccountSnapshot;
-use git_koi::koi::derive_koi_development;
-use git_koi::leetcode::{CurlLeetCodeClient, LeetCodeSnapshot, collect_leetcode_snapshot};
-use git_koi::motion::frame_count;
-use git_koi::output::{encode_gif, encode_png, encode_preview_html, encode_svg};
-use git_koi::render::{KoiFrame, render_koi, render_swim_frame};
+use ltkoi::behavior::{Behavior, select_behavior};
+use ltkoi::betta::{animation_files, betta_preview, derive_betta_development, render_betta};
+use ltkoi::coat::KoiBody;
+use ltkoi::collect::{GhCli, collect_account_snapshot};
+use ltkoi::history::AccountSnapshot;
+use ltkoi::koi::derive_koi_development;
+use ltkoi::leetcode::{CurlLeetCodeClient, LeetCodeSnapshot, collect_leetcode_snapshot};
+use ltkoi::motion::frame_count;
+use ltkoi::output::{encode_gif, encode_png, encode_preview_html, encode_svg};
+use ltkoi::render::{KoiFrame, render_koi, render_swim_frame};
 
-const USAGE: &str = "Usage: git-koi collect LOGIN [--output FILE]
-       git-koi collect-leetcode USERNAME [--output FILE]
-       git-koi animate-betta LEETCODE_SNAPSHOT --output-dir DIR
-       git-koi animate-pond GITHUB_SNAPSHOT LEETCODE_SNAPSHOT --output-dir DIR
-       git-koi render-betta SNAPSHOT --output-dir DIR
-       git-koi render SNAPSHOT --output-dir DIR [--body BODY]
-       git-koi --help | --version
+const USAGE: &str = "Usage: ltkoi collect LOGIN [--output FILE]
+       ltkoi collect-leetcode USERNAME [--output FILE]
+       ltkoi animate-betta LEETCODE_SNAPSHOT --output-dir DIR
+       ltkoi animate-pond GITHUB_SNAPSHOT LEETCODE_SNAPSHOT --output-dir DIR
+       ltkoi render-betta SNAPSHOT --output-dir DIR
+       ltkoi render SNAPSHOT --output-dir DIR [--body BODY]
+       ltkoi --help | --version
 Collect LOGIN's public GitHub snapshot as JSON through `gh api`: public owned and
 contributed repositories, and daily contributions from the account's creation
 through yesterday (UTC), the last complete day.
@@ -42,8 +42,8 @@ Animate-betta exports a looping GIF and an interactive website widget.
 Animate-pond adds an independently developed GitHub koi. Copy the complete output
 folder to a website; embed.html supports hover, focus, tap, and reduced motion.
 Errors go to stderr and exit 1; invalid usage exits 2.
-Examples: git-koi collect octocat --output snapshot.json
-          git-koi render snapshot.json --output-dir koi --body asagi";
+Examples: ltkoi collect octocat --output snapshot.json
+          ltkoi render snapshot.json --output-dir koi --body asagi";
 
 /// Each body's name on the command line.
 const BODY_NAMES: [(&str, KoiBody); 6] = [
@@ -74,7 +74,7 @@ fn main() -> ExitCode {
             ExitCode::SUCCESS
         }
         [Some("--version")] => {
-            println!("git-koi {}", env!("CARGO_PKG_VERSION"));
+            println!("ltkoi {}", env!("CARGO_PKG_VERSION"));
             ExitCode::SUCCESS
         }
         [Some("collect-leetcode"), Some(username)] if !username.starts_with('-') => {
@@ -173,7 +173,7 @@ fn run_animation(profile_path: &Path, github_path: Option<&Path>, directory: &Pa
     match result {
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => {
-            eprintln!("git-koi: {error}");
+            eprintln!("ltkoi: {error}");
             ExitCode::FAILURE
         }
     }
@@ -210,7 +210,7 @@ fn run_render_betta(snapshot_path: &Path, directory: &Path) -> ExitCode {
     match result {
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => {
-            eprintln!("git-koi: {error}");
+            eprintln!("ltkoi: {error}");
             ExitCode::FAILURE
         }
     }
@@ -226,7 +226,7 @@ fn run_collect_leetcode(username: &str, output_path: Option<&Path>) -> ExitCode 
     match result {
         Ok(()) => ExitCode::SUCCESS,
         Err(message) => {
-            eprintln!("git-koi: {message}");
+            eprintln!("ltkoi: {message}");
             ExitCode::FAILURE
         }
     }
@@ -243,7 +243,7 @@ fn run_collect(login: &str, output_path: Option<&Path>) -> ExitCode {
     match collection_result {
         Ok(()) => ExitCode::SUCCESS,
         Err(error_message) => {
-            eprintln!("git-koi: {error_message}");
+            eprintln!("ltkoi: {error_message}");
             ExitCode::FAILURE
         }
     }
@@ -269,7 +269,7 @@ fn run_render(snapshot_path: &Path, output_directory: &Path, koi_body: KoiBody) 
     match render_result {
         Ok(()) => ExitCode::SUCCESS,
         Err(error_message) => {
-            eprintln!("git-koi: {error_message}");
+            eprintln!("ltkoi: {error_message}");
             ExitCode::FAILURE
         }
     }

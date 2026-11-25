@@ -65,7 +65,7 @@ jobs:
         run: cargo +stable build --release --locked
       - name: Generate offline website fixtures
         run: |
-          target/release/git-koi animate-betta tests/fixtures/leetcode/betta-snapshot.json --output-dir target/animated-betta
-          target/release/git-koi animate-pond tests/fixtures/account-with-history.json tests/fixtures/leetcode/betta-snapshot.json --output-dir target/animated-pond
+          target/release/ltkoi animate-betta tests/fixtures/leetcode/betta-snapshot.json --output-dir target/animated-betta
+          target/release/ltkoi animate-pond tests/fixtures/account-with-history.json tests/fixtures/leetcode/betta-snapshot.json --output-dir target/animated-pond
       - name: Verify website interaction
         run: npm run test:widget

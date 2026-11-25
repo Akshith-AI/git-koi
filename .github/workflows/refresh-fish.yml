@@ -1,0 +1,64 @@
+name: Refresh fish
+on:
+  schedule:
+    - cron: "23 5 * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Fish mode
+        type: choice
+        options: [pond, betta, koi]
+        default: pond
+      leetcode_username:
+        description: LeetCode username (blank uses repository variable)
+        type: string
+      github_username:
+        description: GitHub username (blank uses repository owner)
+        type: string
+permissions:
+  contents: write
+concurrency:
+  group: refresh-fish
+  cancel-in-progress: false
+jobs:
+  refresh:
+    if: >-
+      (inputs.mode || vars.LTKOI_MODE || 'pond') == 'koi' ||
+      (inputs.leetcode_username || vars.LEETCODE_USERNAME) != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./
+        id: fish
+        with:
+          mode: ${{ inputs.mode || vars.LTKOI_MODE || 'pond' }}
+          leetcode-username:
+            ${{ inputs.leetcode_username || vars.LEETCODE_USERNAME }}
+          github-username:
+            ${{ inputs.github_username || vars.LTKOI_GITHUB_USERNAME ||
+            github.repository_owner }}
+          output-dir: fish
+      - name: Commit updated fish
+        env:
+          GIF_PATH: ${{ steps.fish.outputs.gif-path }}
+          INCLUDE_WIDGET: ${{ vars.LTKOI_PUBLISH_WIDGET }}
+        run: |
+          if [ "$INCLUDE_WIDGET" = true ]; then
+            git add -- fish/
+          else
+            git add -- "$GIF_PATH"
+          fi
+          if git diff --cached --quiet; then
+            echo "The fish is unchanged."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fish: refresh daily activity"
+          git push
+      - name: Attach website preview
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: daily-fish
+          path: fish/
+          if-no-files-found: error

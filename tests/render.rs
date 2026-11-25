@@ -2,16 +2,16 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::io::Cursor;
 
 use chrono::{Datelike, Days, NaiveDate};
-use git_koi::behavior::Behavior;
-use git_koi::coat::KoiBody;
-use git_koi::history::{AccountSnapshot, ContributionDay, ContributionWeek, LanguageColor};
-use git_koi::koi::{
+use ltkoi::behavior::Behavior;
+use ltkoi::coat::KoiBody;
+use ltkoi::history::{AccountSnapshot, ContributionDay, ContributionWeek, LanguageColor};
+use ltkoi::koi::{
     ADULT_CONTRIBUTIONS, FULL_COLOR_CONTRIBUTIONS, KoiDevelopment, MAX_GROWTH_CONTRIBUTIONS,
     RecentStreak, derive_koi_development,
 };
-use git_koi::motion::frame_count;
-use git_koi::output::encode_png;
-use git_koi::render::{
+use ltkoi::motion::frame_count;
+use ltkoi::output::encode_png;
+use ltkoi::render::{
     FRAME_HEIGHT_PIXELS, FRAME_WIDTH_PIXELS, KoiFrame, render_koi, render_swim_frame,
 };
 

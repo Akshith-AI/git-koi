@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::collections::VecDeque;
 
 use chrono::NaiveDate;
-use git_koi::leetcode::*;
+use ltkoi::leetcode::*;
 use serde_json::{Value, json};
 
 struct Client {

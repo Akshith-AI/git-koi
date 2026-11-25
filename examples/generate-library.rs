@@ -1,16 +1,16 @@
 use std::{env, error::Error, fs, path::Path, process::ExitCode};
 
 use chrono::{Datelike, Days, NaiveDate};
-use git_koi::coat::KoiBody;
-use git_koi::history::{AccountSnapshot, ContributionWeek, LanguageColor};
-use git_koi::koi::{
+use ltkoi::coat::KoiBody;
+use ltkoi::history::{AccountSnapshot, ContributionWeek, LanguageColor};
+use ltkoi::koi::{
     ADULT_CONTRIBUTIONS, KoiDevelopment, MAX_GROWTH_CONTRIBUTIONS, RecentStreak,
     YOUNG_SHAPE_CONTRIBUTIONS, derive_koi_development,
 };
-use git_koi::output::{
+use ltkoi::output::{
     STATIC_EXPORT_SCALE, STATIC_HEIGHT_PIXELS, STATIC_WIDTH_PIXELS, encode_png, encode_svg,
 };
-use git_koi::render::{FRAME_HEIGHT_PIXELS, FRAME_WIDTH_PIXELS, KoiFrame, render_koi};
+use ltkoi::render::{FRAME_HEIGHT_PIXELS, FRAME_WIDTH_PIXELS, KoiFrame, render_koi};
 
 /// Language mixes with GitHub's colors and their shares of the account's projects.
 type LanguageMix = &'static [(&'static str, &'static str, f64)];

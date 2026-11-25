@@ -1,4 +1,4 @@
-use git_koi::leetcode::LeetCodeSnapshot;
+use ltkoi::leetcode::LeetCodeSnapshot;
 use std::{fs, io::Cursor, process::Command};
 
 #[test]
@@ -16,7 +16,7 @@ fn both_commands_export_looping_gifs_and_complete_widget_bundles() {
     fs::write(&github, include_str!("fixtures/account-with-history.json")).unwrap();
     for mode in ["betta", "pond"] {
         let destination = root.join(mode);
-        let mut command = Command::new(env!("CARGO_BIN_EXE_git-koi"));
+        let mut command = Command::new(env!("CARGO_BIN_EXE_ltkoi"));
         command.arg(format!("animate-{mode}"));
         if mode == "pond" {
             command.arg(&github);
@@ -64,7 +64,7 @@ fn both_commands_export_looping_gifs_and_complete_widget_bundles() {
             serde_json::from_slice(&fs::read(&profile).unwrap()).unwrap();
         invalid.schema_version = 9;
         fs::write(&profile, serde_json::to_vec(&invalid).unwrap()).unwrap();
-        let mut command = Command::new(env!("CARGO_BIN_EXE_git-koi"));
+        let mut command = Command::new(env!("CARGO_BIN_EXE_ltkoi"));
         command.arg(format!("animate-{mode}"));
         if mode == "pond" {
             command.arg(&github);
@@ -101,7 +101,7 @@ fn animation_usage_is_validated_before_any_rendering() {
         vec!["animate-betta", "x", "--bad", "y"],
     ] {
         assert_eq!(
-            Command::new(env!("CARGO_BIN_EXE_git-koi"))
+            Command::new(env!("CARGO_BIN_EXE_ltkoi"))
                 .args(args)
                 .output()
                 .unwrap()
@@ -112,7 +112,7 @@ fn animation_usage_is_validated_before_any_rendering() {
     }
     for command in ["animate-betta", "animate-pond"] {
         assert!(
-            Command::new(env!("CARGO_BIN_EXE_git-koi"))
+            Command::new(env!("CARGO_BIN_EXE_ltkoi"))
                 .args([command, "--help"])
                 .output()
                 .unwrap()

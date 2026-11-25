@@ -22,7 +22,7 @@ code,a{{color:#9dd9dc}}small{{color:#bccbd3}}
 Topic proportions warp the marble patches; these are overlapping tag counts, not a disjoint breakdown.</p>
 <p>Blank-topic or restricted-topic accounts keep identity-based marbling. Calendar availability does not shrink the fish.</p>
 <p><a href="betta.svg">SVG portrait</a> · <a href="traits.json">Visual traits</a></p>
-<small>Observed {date} UTC. Still renderer only; animation, shared pond and hover flaring are planned.
+<small>Observed {date} UTC. Still portrait. Use animate-betta or animate-pond for swimming and website flaring.
 Koi pipeline adapted from Anthony Yalong's git-koi (MIT); betta geometry and marbling added by LTKoi.</small>
 </main></body></html>"#,
         total = snapshot.solved.all,

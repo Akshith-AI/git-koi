@@ -1,5 +1,5 @@
-use git_koi::betta::{betta_preview, derive_betta_development, render_betta};
-use git_koi::leetcode::{Availability, LeetCodeSnapshot, SolvedCounts};
+use ltkoi::betta::{betta_preview, derive_betta_development, render_betta};
+use ltkoi::leetcode::{Availability, LeetCodeSnapshot, SolvedCounts};
 use std::{fs, process::Command};
 
 fn snapshot() -> LeetCodeSnapshot {
@@ -156,7 +156,7 @@ fn preview_escapes_untrusted_text_and_does_not_claim_interactivity() {
     assert!(!html.contains("<script>"));
     assert!(html.contains("&lt;script&gt;&quot;&amp;"));
     assert!(html.contains("Still portrait"));
-    assert!(html.contains("hover flaring are planned"));
+    assert!(html.contains("Use animate-betta or animate-pond"));
 }
 
 #[test]
@@ -168,7 +168,7 @@ fn command_exports_png_svg_traits_and_preview_and_preserves_files_on_bad_input()
     fs::write(&source, serde_json::to_vec(&snapshot()).unwrap()).unwrap();
     let output = directory.join("portrait");
     let run = || {
-        Command::new(env!("CARGO_BIN_EXE_git-koi"))
+        Command::new(env!("CARGO_BIN_EXE_ltkoi"))
             .args([
                 "render-betta",
                 source.to_str().unwrap(),

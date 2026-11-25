@@ -1,6 +1,6 @@
 use chrono::{Days, NaiveDate};
-use git_koi::betta::*;
-use git_koi::leetcode::{ActivityCalendar, Availability, LeetCodeSnapshot};
+use ltkoi::betta::*;
+use ltkoi::leetcode::{ActivityCalendar, Availability, LeetCodeSnapshot};
 use std::collections::BTreeMap;
 
 fn snapshot() -> LeetCodeSnapshot {
@@ -84,11 +84,11 @@ fn pond_lanes_are_distinct_and_scene_wraps() {
     let profile = snapshot();
     let traits = derive_betta_development(&profile).unwrap();
     let betta = render_betta(&traits);
-    let account: git_koi::history::AccountSnapshot =
+    let account: ltkoi::history::AccountSnapshot =
         serde_json::from_str(include_str!("fixtures/account-with-history.json")).unwrap();
-    let koi = git_koi::render::render_koi(
-        &git_koi::koi::derive_koi_development(&account).unwrap(),
-        git_koi::coat::KoiBody::Asagi,
+    let koi = ltkoi::render::render_koi(
+        &ltkoi::koi::derive_koi_development(&account).unwrap(),
+        ltkoi::coat::KoiBody::Asagi,
     );
     let scene = compose_pond(&betta, &koi, 0);
     assert_eq!(scene, compose_pond(&betta, &koi, BETTA_FRAMES));

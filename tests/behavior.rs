@@ -1,7 +1,7 @@
 use chrono::{Days, NaiveDate};
-use git_koi::behavior::{Behavior, select_behavior};
-use git_koi::history::{AccountSnapshot, ContributionDay, ContributionHistory};
-use git_koi::koi::{KoiDevelopment, derive_koi_development};
+use ltkoi::behavior::{Behavior, select_behavior};
+use ltkoi::history::{AccountSnapshot, ContributionDay, ContributionHistory};
+use ltkoi::koi::{KoiDevelopment, derive_koi_development};
 
 #[test]
 fn quiet_days_bring_rest_then_deep_rest() {

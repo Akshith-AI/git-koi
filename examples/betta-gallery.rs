@@ -1,8 +1,8 @@
 //! Generate deterministic still-image examples from synthetic LeetCode profiles.
 use chrono::NaiveDate;
-use git_koi::betta::{derive_betta_development, render_betta};
-use git_koi::leetcode::{Availability, LeetCodeSnapshot, SolvedCounts, TopicCount};
-use git_koi::output::encode_png;
+use ltkoi::betta::{derive_betta_development, render_betta};
+use ltkoi::leetcode::{Availability, LeetCodeSnapshot, SolvedCounts, TopicCount};
+use ltkoi::output::encode_png;
 use std::{error::Error, fs, path::Path};
 
 fn main() -> Result<(), Box<dyn Error>> {

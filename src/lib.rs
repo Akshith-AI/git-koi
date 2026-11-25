@@ -15,7 +15,7 @@
 //!    it as PNG, SVG, or a looping GIF, with a preview page.
 //!
 //! Everything after collection is deterministic: it reads no clock, performs no I/O, and
-//! mutates no input. Callers own files and publication. The `git-koi` command composes
+//! mutates no input. Callers own files and publication. The `ltkoi` command composes
 //! these stages; the repository's getting-started guide covers the command and the GitHub
 //! Action. Breaking changes to this API bump the major version.
 #![warn(missing_docs)]

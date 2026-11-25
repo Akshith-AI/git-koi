@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use chrono::{Datelike, Days, NaiveDate};
-use git_koi::history::{
+use ltkoi::history::{
     AccountSnapshot, ConflictingRepository, ContributionDay, ContributionHistory,
     ContributionHistoryError, LanguageColor, RepositoryVisibility, calculate_language_shares,
     summarize_contributions,

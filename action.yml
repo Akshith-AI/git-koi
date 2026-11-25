@@ -1,76 +1,65 @@
-name: git-profile-koi
+name: LTKoi fish
 description:
-  Draw a GitHub account's koi from its public activity as a looping GIF, a still
-  PNG, and a preview, for a profile README.
+  Draw your LeetCode Halfmoon betta or a shared pond with a GitHub koi, as a GIF
+  and interactive website embed.
 branding:
   icon: droplet
-  color: blue
-
+  color: orange
 inputs:
-  login:
-    description: Account whose koi to draw.
+  mode:
+    description: "Output mode: betta, pond, or koi."
+    default: betta
+  leetcode-username:
+    description:
+      Public LeetCode username, required for betta and pond unless a snapshot is
+      supplied.
+  github-username:
+    description: GitHub account for pond and koi modes.
     default: ${{ github.repository_owner }}
   body:
-    description: Body color, one of white, black, asagi, tea, gold, or platinum.
+    description:
+      "GitHub-only koi body: white, black, asagi, tea, gold, platinum."
     default: white
   output-dir:
-    description:
-      Folder, relative to the workspace, that receives koi.gif, koi.png, and
-      preview.html.
-    default: koi
+    description: Relative output folder in the checked-out workspace.
+    default: fish
+  leetcode-snapshot:
+    description: Optional path to a previously collected LeetCode JSON snapshot.
+  github-snapshot:
+    description: Optional path to a previously collected GitHub JSON snapshot.
   token:
     description:
-      Token for reading the account's public data; the built-in token is enough.
+      Token for reading public GitHub data and release assets; the built-in
+      token is enough.
     default: ${{ github.token }}
-
+outputs:
+  gif-path:
+    description: Relative path to the generated GIF.
+    value: ${{ steps.fish.outputs.gif-path }}
+  preview-path:
+    description: Relative path to the generated preview page.
+    value: ${{ steps.fish.outputs.preview-path }}
+  mode:
+    description: Validated output mode.
+    value: ${{ steps.fish.outputs.mode }}
 runs:
   using: composite
   steps:
-    - name: Download the git-koi release this Action belongs to
+    - name: Install the LTKoi release
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.token }}
-      run: |
-        version=$(grep -m1 '^version' "$GITHUB_ACTION_PATH/Cargo.toml" | cut -d'"' -f2)
-        repository=$(grep -m1 '^repository' "$GITHUB_ACTION_PATH/Cargo.toml" | cut -d'"' -f2)
-        case "$RUNNER_OS-$RUNNER_ARCH" in
-          Linux-X64) target=x86_64-unknown-linux-musl ;;
-          Linux-ARM64) target=aarch64-unknown-linux-musl ;;
-          macOS-X64) target=x86_64-apple-darwin ;;
-          macOS-ARM64) target=aarch64-apple-darwin ;;
-          *)
-            echo "git-koi has no build for $RUNNER_OS $RUNNER_ARCH; use ubuntu-latest" >&2
-            exit 1
-            ;;
-        esac
-        archive="git-koi-$version-$target.tar.gz"
-        install_dir="$RUNNER_TEMP/git-koi"
-        mkdir -p "$install_dir"
-        if ! gh release download "v$version" --repo "$repository" --dir "$install_dir" \
-            --pattern "$archive" --pattern "$archive.sha256"; then
-          echo "release v$version has no asset $archive; reference the Action at a release tag" >&2
-          exit 1
-        fi
-        cd "$install_dir"
-        if command -v sha256sum > /dev/null; then
-          sha256sum -c "$archive.sha256"
-        else
-          shasum -a 256 -c "$archive.sha256"
-        fi
-        tar -xzf "$archive"
-        echo "$install_dir/git-koi-$version-$target" >> "$GITHUB_PATH"
-    - name: Collect the account snapshot
+      run: bash "$GITHUB_ACTION_PATH/scripts/install-release.sh"
+    - name: Collect profiles and generate fish
+      id: fish
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.token }}
-        KOI_LOGIN: ${{ inputs.login }}
-      run:
-        git-koi collect "$KOI_LOGIN" --output "$RUNNER_TEMP/koi-snapshot.json"
-    - name: Render the koi
-      shell: bash
-      env:
-        KOI_BODY: ${{ inputs.body }}
-        KOI_OUTPUT_DIR: ${{ inputs.output-dir }}
-      run:
-        git-koi render "$RUNNER_TEMP/koi-snapshot.json" --output-dir
-        "$KOI_OUTPUT_DIR" --body "$KOI_BODY"
+        LTKOI_MODE: ${{ inputs.mode }}
+        LTKOI_LEETCODE_USERNAME: ${{ inputs.leetcode-username }}
+        LTKOI_GITHUB_USERNAME: ${{ inputs.github-username }}
+        LTKOI_BODY: ${{ inputs.body }}
+        LTKOI_OUTPUT_DIR: ${{ inputs.output-dir }}
+        LTKOI_LEETCODE_SNAPSHOT: ${{ inputs.leetcode-snapshot }}
+        LTKOI_GITHUB_SNAPSHOT: ${{ inputs.github-snapshot }}
+      run: bash "$GITHUB_ACTION_PATH/scripts/run-action.sh"

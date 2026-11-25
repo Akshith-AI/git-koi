@@ -1,5 +1,5 @@
 use chrono::NaiveDate;
-use git_koi::leetcode::*;
+use ltkoi::leetcode::*;
 use serde_json::{Value, json};
 
 fn date() -> NaiveDate {

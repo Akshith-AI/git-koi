@@ -6,7 +6,7 @@ use std::path::PathBuf;
 use std::process::{Command, Output};
 use std::sync::atomic::{AtomicU64, Ordering};
 
-use git_koi::leetcode::{Availability, LeetCodeSnapshot};
+use ltkoi::leetcode::{Availability, LeetCodeSnapshot};
 
 static NEXT: AtomicU64 = AtomicU64::new(0);
 struct Scratch(PathBuf);
@@ -26,7 +26,7 @@ impl Scratch {
         fs::set_permissions(path, fs::Permissions::from_mode(0o755)).unwrap();
     }
     fn run(&self, args: &[&str]) -> Output {
-        Command::new(env!("CARGO_BIN_EXE_git-koi"))
+        Command::new(env!("CARGO_BIN_EXE_ltkoi"))
             .args(args)
             .env("PATH", &self.0)
             .env(
