@@ -1,117 +1,134 @@
 # LTKoi
 
-LTKoi is a work-in-progress adaptation of
-[git-koi](https://github.com/yalongwastaken/git-koi) that will turn LeetCode
-progress into a male Halfmoon betta with koi marbling.
+Turn LeetCode progress into a male Halfmoon betta with koi marbling, or put it
+beside a GitHub koi in a shared pond. Export a looping GIF for a profile README
+and a self-contained website widget with hover, keyboard, and tap flaring.
 
-Two output modes are planned:
+| Mode    | Accounts          | Output                                     |
+| ------- | ----------------- | ------------------------------------------ |
+| `betta` | LeetCode          | A personalized Halfmoon betta              |
+| `pond`  | LeetCode + GitHub | Betta and koi with independent development |
+| `koi`   | GitHub            | The original GitHub activity koi           |
 
-- **Betta:** a LeetCode betta whose growth, colors, and patterns reflect solving
-  progress.
-- **Pond:** the LeetCode betta alongside a GitHub koi, each developing from its
-  own account's activity.
+![Example LeetCode betta with moving fins](docs/animation/betta.gif)
 
-**Current status:** GitHub koi generation, LeetCode collection, betta portraits,
-animated betta and shared-pond GIFs, and interactive website embeds are
-available from this checkout. Release packaging and automated refresh setup
-remain stage 5. The executable and Rust package are still named `git-koi`.
+The example above uses synthetic data. The configured daily pond for this fork
+uses **Hecker2026** on LeetCode and **Akshith-AI** on GitHub.
 
-Collect a public LeetCode profile from this checkout:
+## Put a fish on your GitHub profile
 
-```sh
-cargo run --release --locked -- collect-leetcode YOUR_LEETCODE_USERNAME --output target/leetcode.json
+1. Copy [examples/profile-workflow.yml](examples/profile-workflow.yml) into your
+   profile repository as `.github/workflows/refresh-fish.yml`.
+2. In that repository's **Settings → Secrets and variables → Actions →
+   Variables**, add `LEETCODE_USERNAME` with your public LeetCode username.
+3. Run **Refresh fish** from the Actions tab once.
+4. Add this to your profile README:
+
+   ```html
+   <img
+     src="fish/pond.gif"
+     width="512"
+     alt="My LeetCode betta and GitHub koi"
+   />
+   ```
+
+The workflow runs daily at **05:23 UTC** and commits the GIF only when it
+changes. To use a betta alone, set repository variable `LTKOI_MODE` to `betta`
+and embed `fish/betta.gif`. For GitHub only, choose `koi` and embed
+`fish/koi.gif`—no LeetCode username is required. `LTKOI_GITHUB_USERNAME`
+overrides the repository owner.
+
+The Action itself never commits or deploys anything. Your workflow owns those
+steps. Its built-in GitHub token is sufficient; no LeetCode session cookie or
+password is required.
+
+## Use the Action in an existing workflow
+
+```yaml
+- uses: Akshith-AI/git-koi@v0.1.0
+  id: fish
+  with:
+    mode: pond
+    leetcode-username: YOUR_LEETCODE_USERNAME
+    github-username: YOUR_GITHUB_USERNAME
+    output-dir: fish
 ```
 
-See the [LeetCode guide](docs/leetcode.md) for requirements, field meanings,
-topic overlap, and unavailable-data handling. Draw a still portrait from that
-data:
+The Action supports Linux and macOS GitHub-hosted runners and downloads the
+matching release binary with checksum verification. Pin the full release tag
+above, or pin a commit SHA. [All settings and outputs](docs/getting-started.md).
+
+## Run locally
+
+Download the archive for your platform from
+[LTKoi releases](https://github.com/Akshith-AI/git-koi/releases), verify its
+`.sha256` file, extract it, and put `ltkoi` on your PATH. Or build from source
+with Rust 1.88 or newer:
 
 ```sh
-cargo run --release --locked -- render-betta target/leetcode.json --output-dir target/my-betta
+cargo install --git https://github.com/Akshith-AI/git-koi --tag v0.1.0 --locked
 ```
 
-See the [betta guide and gallery](docs/betta.md) for the visual legend and
-sample portraits. This generates PNG/SVG stills, not an animated betta GIF.
-
-Generate an animated betta and hover-flare website widget:
+Collect a public profile and generate the betta:
 
 ```sh
-cargo run --release --locked -- animate-betta target/leetcode.json --output-dir target/animated-betta
+ltkoi collect-leetcode YOUR_LEETCODE_USERNAME --output leetcode.json
+ltkoi animate-betta leetcode.json --output-dir fish
 ```
 
-See the [animation and embedding guide](docs/animation.md) for the shared pond,
-website integration, keyboard/touch controls, and reduced-motion support.
+For a shared pond, install the [GitHub CLI](https://cli.github.com),
+authenticate with `gh auth login`, then:
 
-See the [roadmap](docs/roadmap.md) for the five implementation stages and the
-[local baseline guide](docs/local-baseline.md) for a sample render without
-GitHub authentication.
+```sh
+ltkoi collect YOUR_GITHUB_USERNAME --output github.json
+ltkoi animate-pond github.json leetcode.json --output-dir fish
+```
 
-## Attribution
+Collection needs curl for LeetCode and an authenticated GitHub CLI for GitHub.
+Rendering saved snapshots needs no network. Stills remain available through
+`render-betta`; GitHub-only koi rendering uses `render`.
 
-LTKoi is maintained in
-[Akshith-AI/git-koi](https://github.com/Akshith-AI/git-koi) and is based on
-[git-koi](https://github.com/yalongwastaken/git-koi) by
+## Embed on a website
+
+Copy the complete generated `fish/` folder to your static site and embed
+`/fish/embed.html` in an iframe. It includes swimming, independent fin movement,
+hover/focus/tap flaring, a pause button, and reduced-motion support. A README
+GIF cannot respond to hover.
+
+[Website setup and examples](docs/animation.md) ·
+[Fish traits and gallery](docs/betta.md) ·
+[LeetCode data meanings and limits](docs/leetcode.md)
+
+## Daily refresh settings
+
+| Repository variable     | Default          | Meaning                                               |
+| ----------------------- | ---------------- | ----------------------------------------------------- |
+| `LEETCODE_USERNAME`     | Unset            | Public LeetCode username; required for betta/pond     |
+| `LTKOI_MODE`            | `pond`           | `betta`, `pond`, or `koi`                             |
+| `LTKOI_GITHUB_USERNAME` | Repository owner | Public GitHub account                                 |
+| `LTKOI_PUBLISH_WIDGET`  | `false`          | Commit the full website bundle in addition to the GIF |
+
+Every refresh attaches the complete output as a downloadable Actions artifact.
+The profile example commits only the chosen GIF by default. Setting
+`LTKOI_PUBLISH_WIDGET=true` also keeps the website assets in Git; hosting
+remains under your website's control. Schedules can be delayed by GitHub and may
+pause in inactive public repositories; a manual run is always available.
+
+## Attribution and license
+
+LTKoi adapts [git-koi](https://github.com/yalongwastaken/git-koi) by
 [Anthony Yalong (@yalongwastaken)](https://github.com/yalongwastaken). The
-existing koi geometry, coloring, movement, rendering, GIF output, and supporting
-code originate from his project. The images below are upstream koi examples, not
-previews of the planned betta.
+original koi geometry, coat, movement, frame encoding, and supporting
+history/collection pipeline originate from his MIT-licensed project. LTKoi adds
+the LeetCode data source, original Halfmoon betta art, animation, shared pond,
+and website controls.
 
-The original MIT license and copyright notice are preserved in
-[LICENSE](LICENSE). See [NOTICE.md](NOTICE.md) for provenance and the scope of
-this adaptation.
+The original copyright and permission notice are retained in [LICENSE](LICENSE).
+See [NOTICE.md](NOTICE.md), [CHANGELOG.md](CHANGELOG.md), and the preserved
+[upstream changelog](docs/upstream-changelog.md).
 
-## Original GitHub koi functionality
+## Development
 
-Git koi draws a pixel-art koi from a GitHub account's public activity. Its
-languages color it, its contributions grow it, its streaks mark it, and the day
-that just ended decides how it swims. A nightly workflow puts the koi on a
-profile README as a looping GIF, the same tool runs from the command line, and
-the Rust library underneath is published on crates.io.
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/yalongwastaken/yalongwastaken/main/koi/koi.gif" width="256" alt="The author's koi, redrawn every night from the day's activity" />
-</p>
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/bodies-dark.png" />
-  <img src="docs/bodies-light.png" alt="The six bodies, white, black, Asagi, tea, gold, and platinum, at each growth stage" />
-</picture>
-
-## Repository Structure
-
-```text
-.
-├── .github/      workflows, issue forms, and Dependabot
-├── docs/         the getting-started guide and the render sheets
-├── examples/     the profile workflow and the koi library generator
-├── src/          the library and the git-koi command
-├── tests/        the public-boundary tests and their fixtures
-└── action.yml    the GitHub Action
-```
-
-## Usage
-
-### Requirements
-
-- For a koi on your profile README: a GitHub account. The Action runs in your
-  profile repository's workflow with its built-in token.
-- For the command line: a binary from the
-  [releases page](https://github.com/yalongwastaken/git-koi/releases), or Rust
-  at or above the `rust-version` in [Cargo.toml](Cargo.toml), plus the
-  [GitHub CLI](https://cli.github.com), authenticated.
-- For the library: Rust at or above that same version.
-
-[docs/getting-started.md](docs/getting-started.md) walks through all three: the
-Action in a profile workflow, the command line, and the library. The API is
-documented on [docs.rs](https://docs.rs/git-koi).
-
-## Original project author
-
-**Anthony Yalong**
-
-- Email: yalong.anthony123@gmail.com
-- GitHub: [@yalongwastaken](https://github.com/yalongwastaken)
-
-## License
-
-MIT. See [LICENSE](LICENSE).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for checks and browser tests,
+[docs/releasing.md](docs/releasing.md) for the release process, and
+[docs/roadmap.md](docs/roadmap.md) for implementation stages.

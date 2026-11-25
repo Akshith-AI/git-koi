@@ -116,4 +116,4 @@ Verified on November 25, 2026, with Rust 1.88.0 on Apple Silicon macOS:
 This command remains a still-image renderer. Stage 4 adds separate animation
 commands, the shared pond, and website hover/focus/tap flaring; see the
 [animation guide](animation.md). Release packaging and an automatically
-refreshed published Action remain stage 5.
+refreshed Action are covered in the [setup guide](getting-started.md).

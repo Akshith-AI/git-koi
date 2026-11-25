@@ -59,13 +59,13 @@ both fish readable in the pond; an interactive website preview supports hover,
 keyboard focus, touch, and reduced motion. See the
 [animation and embedding guide](animation.md) for commands and verification.
 
-## 5. Release and onboarding
+## 5. Release and onboarding — release verification
 
 Adapt the Action and release packaging for this fork. Document username inputs,
 mode selection, daily refresh, examples, attribution, and the trait legend.
 Verify that release downloads use this fork's assets before publishing. The
-inherited Action and profile example currently refer to upstream releases and
-must not be presented as an LTKoi release.
+Action, profile example, and release metadata use this fork's assets. The
+original upstream license and attribution remain intact.
 
 Acceptance: a new user can follow the instructions and generate either mode from
 a published release. Publishing is a later stage, not part of the foundation.

@@ -1,4 +1,8 @@
-# Local foundation baseline
+# Local foundation baseline (historical stage 1)
+
+This records the inherited stage 1 baseline. Stage 5 renames the command and
+package to `ltkoi`; use [the current setup guide](getting-started.md) for
+installation and releases.
 
 This guide exercises the inherited GitHub koi generator from this checkout. It
 does not yet generate a LeetCode betta. The sample profile is synthetic test

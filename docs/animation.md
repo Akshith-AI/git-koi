@@ -171,6 +171,6 @@ For an installed browser, set `LTKOI_BROWSER` to its executable path instead of
 installing Chromium. The CI widget job generates both bundles from fixtures and
 runs these browser checks without account access.
 
-Stage 5 remains: fork-specific release packaging, the daily refresh workflow,
-installation examples, and publishing. This stage does not publish or host a
-site.
+The [setup guide](getting-started.md) covers the published Action, daily
+refresh, and release installation. Static website hosting remains under the
+user's control.
