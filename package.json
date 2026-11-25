@@ -1,0 +1,10 @@
+{
+  "name": "ltkoi-widget-tests",
+  "private": true,
+  "scripts": {
+    "test:widget": "node tests/web/widget.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.65.1"
+  }
+}

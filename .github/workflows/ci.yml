@@ -1,6 +1,6 @@
 name: CI
 
-# The gates every change passes. The ruleset on main requires both jobs.
+# Validate Rust code, documentation, and portable website widgets.
 on:
   pull_request:
   push:
@@ -48,3 +48,24 @@ jobs:
         run: rustup toolchain install "$RUST_VERSION" --profile minimal
       - name: Check on it
         run: cargo "+$RUST_VERSION" check --locked --all-targets
+
+  widget:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Rust
+        run: rustup toolchain install stable --profile minimal
+      - name: Install browser test dependencies
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Build the local renderer
+        run: cargo +stable build --release --locked
+      - name: Generate offline website fixtures
+        run: |
+          target/release/git-koi animate-betta tests/fixtures/leetcode/betta-snapshot.json --output-dir target/animated-betta
+          target/release/git-koi animate-pond tests/fixtures/account-with-history.json tests/fixtures/leetcode/betta-snapshot.json --output-dir target/animated-pond
+      - name: Verify website interaction
+        run: npm run test:widget
