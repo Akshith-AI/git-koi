@@ -42,10 +42,14 @@ pub fn animation_files(
     let mut frames = Vec::with_capacity((BETTA_FRAMES * FLARE_LEVELS) as usize);
     for level in 0..FLARE_LEVELS {
         for i in 0..BETTA_FRAMES {
-            let betta = render_betta_frame(
-                &development,
-                betta_pose(i, activity, f64::from(level) / f64::from(FLARE_LEVELS - 1)),
-            );
+            let mut pose = betta_pose(i, activity, f64::from(level) / f64::from(FLARE_LEVELS - 1));
+            if koi.is_some() {
+                // The compositor owns the pond course; preserve a full-size local fish.
+                pose.dx = 0.;
+                pose.dy = 0.;
+                pose.scene_scale = 1.;
+            }
+            let betta = render_betta_frame(&development, pose);
             frames.push(if let Some(koi) = &koi {
                 compose_pond(&betta, &koi[i as usize], i)
             } else {

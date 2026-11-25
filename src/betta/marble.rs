@@ -29,14 +29,26 @@ pub(super) fn color(development: &BettaDevelopment, [x, y]: [f64; 2], region: Re
     let white = 0.20 + 0.55 * shares[0];
     let red = 0.20 + 0.55 * shares[1];
     let mut base = if pigment < white {
-        [232., 235., 228.]
+        [233., 229., 215.]
     } else if pigment < white + red {
-        [194., 32., 48.]
+        [205., 48., 45.]
     } else {
-        [33., 62., 116.]
+        [40., 65., 102.]
     };
+    // Warm patches share the coherent marble field: broad gold and tangerine
+    // islands rather than isolated bright pixels. Difficulty still sets the base mix.
+    let warmth = noise(px * 0.038 + 11., py * 0.038 - 7., seed ^ 0xa19f);
+    if pigment >= white && pigment < white + red && warmth > 0.46 {
+        base = if warmth > 0.66 {
+            [239., 187., 63.]
+        } else {
+            [233., 119., 36.]
+        };
+    } else if pigment < white && warmth > 0.67 {
+        base = [238., 198., 82.];
+    }
     // Fine dark islands break large patches without using uncorrelated pixel noise.
-    if noise(px * 0.14, py * 0.14, seed ^ 0x8877) > 0.79 {
+    if noise(px * 0.14, py * 0.14, seed ^ 0x8877) > 0.85 {
         base = [24., 32., 53.];
     }
     let angle = (y - 126.).atan2(x - 113.);
@@ -49,17 +61,17 @@ pub(super) fn color(development: &BettaDevelopment, [x, y]: [f64; 2], region: Re
         Region::Body => {
             let belly = ((y - 118.) / 31.).abs().min(1.);
             let scales = ((x + ((y / 3.).floor() % 2.) * 2.) * 1.55).cos() * (y * 2.1).cos();
-            1.04 - 0.23 * belly + 0.035 * scales
+            1.04 - 0.23 * belly + 0.018 * scales
         }
         Region::Tail => {
             let fold = (angle * 36. + radius * 0.015).cos();
             if radius > 78. && pigment < white + 0.18 {
                 base = [208., 223., 233.];
             }
-            0.80 + 0.17 * fold.abs() + 0.08 * (radius / 86.)
+            0.86 + 0.10 * fold.abs() + 0.05 * (radius / 86.)
         }
-        Region::Dorsal => 0.82 + 0.18 * ((x - 143.).atan2(110. - y) * 26.).cos().abs(),
-        Region::Anal => 0.77 + 0.23 * ((x - 150.).atan2(y - 130.) * 29.).cos().abs(),
+        Region::Dorsal => 0.88 + 0.12 * ((x - 143.).atan2(110. - y) * 26.).cos().abs(),
+        Region::Anal => 0.86 + 0.14 * ((x - 150.).atan2(y - 130.) * 29.).cos().abs(),
         Region::Ventral => {
             base = [218., 222., 228.];
             0.80 + 0.20 * (x * 1.3).cos().abs()

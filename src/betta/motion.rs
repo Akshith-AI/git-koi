@@ -57,10 +57,16 @@ pub struct BettaPose {
     pub energy: f64,
     /// Fin and operculum opening, zero relaxed and one fully flared.
     pub flare: f64,
-    /// Gentle horizontal drift in native pixels.
+    /// Horizontal position on the swimming course, in scene pixels.
     pub dx: f64,
-    /// Gentle vertical drift in native pixels.
+    /// Vertical position on the swimming course, in scene pixels.
     pub dy: f64,
+    /// Signed horizontal foreshortening; negative faces left during the return.
+    pub projection: f64,
+    /// Small bank angle in radians, following the direction of travel.
+    pub pitch: f64,
+    /// Camera scale that leaves room to swim around the scene.
+    pub scene_scale: f64,
 }
 
 /// Derive a loop-closing pose without random state or wall-clock reads.
@@ -71,6 +77,10 @@ pub fn betta_pose(frame: u32, activity: BettaActivity, flare: f64) -> BettaPose 
         BettaActivity::Quiet => 0.4,
         BettaActivity::Unknown => 0.7,
     };
+    // Slight acceleration and gliding, while retaining a seamless periodic course.
+    let course = phase + 0.16 * (phase * 2.).sin();
+    let heading = course.cos();
+    let facing = if heading >= 0. { 1. } else { -1. };
     BettaPose {
         phase,
         energy,
@@ -79,7 +89,11 @@ pub fn betta_pose(frame: u32, activity: BettaActivity, flare: f64) -> BettaPose 
         } else {
             0.
         },
-        dx: 3. * phase.sin() * energy,
-        dy: 2. * (phase * 2.).sin() * energy,
+        dx: 48. * course.sin(),
+        dy: 18. * course.cos(),
+        // Hold a readable side view during the glide, then turn edge-on briefly.
+        projection: facing * heading.abs().powf(0.22).max(0.20),
+        pitch: (-18. * course.sin()).atan2(48. * heading.abs() + 8.) * 0.28 * facing,
+        scene_scale: 0.66,
     }
 }

@@ -41,14 +41,15 @@ files are not a single filesystem transaction if a write fails halfway through.
 | ------------- | ---------------------------------------------------- |
 | Username      | Stable placement of marble patches, case-insensitive |
 | Unique solves | Logarithmic size growth, capped at 3,000 solves      |
-| Easy share    | More ivory pigment                                   |
-| Medium share  | More crimson pigment                                 |
+| Easy share    | More ivory pigment, with gold accents                |
+| Medium share  | More crimson pigment, with tangerine accents         |
 | Hard share    | More indigo pigment                                  |
 | Topic mix     | Smooth directional warping of marble patch shapes    |
 | No topic data | Identity-based marbling remains available            |
 
-All three pigments keep a baseline presence so the fish stays recognizably koi
-marbled. Difficulty shares influence the palette; they are not exact measured
+Ivory, crimson, and indigo keep a baseline presence so the fish stays
+recognizably koi marbled, with coherent gold and tangerine patches adding
+warmth. Difficulty shares influence the palette; they are not exact measured
 pixel-area percentages. A confirmed zero-solve account has a neutral starter
 palette. Every growth stage retains Halfmoon fins; the minimum linear scale is
 64% of the mature portrait. Growth never rerolls the username's identity seed.

@@ -33,9 +33,12 @@ cargo run --release --locked -- animate-pond target/github.json target/leetcode.
 
 The koi's growth, coat, and chosen behavior still come from its GitHub snapshot.
 The betta's size, difficulty palette, and topic marbling come from LeetCode.
-Each fish swims in its own lane, with opposite lateral courses so the fish stay
-readable without crossing or clipping. The koi's native loop is retimed to the
-shared four-second loop. It is not assigned the betta's activity or growth.
+Each fish swims in its own lane, with opposite curved courses so the fish stay
+readable without crossing or clipping. The betta turns to face its travel rather
+than sliding backward. In betta-only mode it follows a wider oval course, with
+foreshortened turns, gentle banking, and trailing tail and fin waves. The koi's
+native loop is retimed to the shared four-second loop. It is not assigned the
+betta's activity or growth.
 
 This synthetic example has a juvenile GitHub koi because the inherited fixture
 contains few contributions; a mature GitHub profile produces a larger koi:
@@ -59,6 +62,10 @@ colors plus transparency. This approximates colors for GIF export only; the PNG,
 SVG, and website atlas keep full color. The original exact-color GitHub koi
 encoder is unchanged. GIFs swim in a relaxed pose; hover flaring is a website
 feature, not a GIF feature.
+
+The marbling includes ivory, crimson, indigo, tangerine, and gold, with softer
+fin shading. Difficulty influences the base color balance and topics shape
+coherent patches; the warm accents do not invent extra activity metrics.
 
 The sprite atlas is 2560 by 7680 pixels and can be several megabytes. It is
 loaded once by the widget; interaction never calls LeetCode or GitHub. A bundle
@@ -125,8 +132,8 @@ and endpoint streak values are not reinterpreted as current daily streaks.
 Verified November 25, 2026, on Apple Silicon macOS with Rust 1.88 and headless
 Chrome:
 
-- All 132 Rust tests passed in the release profile, including eight new motion
-  and animation-export tests. Formatting, Clippy with warnings denied, release
+- All 134 Rust tests passed in the release profile, including ten new motion and
+  animation-export tests. Formatting, Clippy with warnings denied, release
   build, and API documentation with warnings denied passed.
 - Rust tests cover loop closure, bounds at every flare level, activity fallback,
   atlas layout, escaped widget text, safe lane separation, command usage,

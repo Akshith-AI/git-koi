@@ -19,7 +19,7 @@ fn poses_wrap_and_opening_is_bounded() {
         );
         let first = betta_pose(0, activity, 0.);
         let last = betta_pose(BETTA_FRAMES - 1, activity, 0.);
-        assert!((first.dx - last.dx).abs() < 0.4 && (first.dy - last.dy).abs() < 0.5);
+        assert!((first.dx - last.dx).abs() < 7. && (first.dy - last.dy).abs() < 0.5);
     }
     assert_eq!(betta_pose(0, BettaActivity::Unknown, f64::NAN).flare, 0.);
     assert_eq!(betta_pose(0, BettaActivity::Unknown, 99.).flare, 1.);
@@ -153,4 +153,68 @@ fn maximum_size_active_flare_and_pond_keep_safe_margins() {
             }
         }
     }
+}
+
+#[test]
+fn swimming_travels_across_the_scene_and_faces_its_direction() {
+    let traits = derive_betta_development(&snapshot()).unwrap();
+    let mut centers = Vec::new();
+    for frame in (0..BETTA_FRAMES).step_by(5) {
+        let pose = betta_pose(frame, BettaActivity::Unknown, 0.);
+        let image = render_betta_frame(&traits, pose);
+        let mut sum = [0_usize; 2];
+        let mut count = 0;
+        for (i, pixel) in image.as_rgba_bytes().chunks_exact(4).enumerate() {
+            if pixel[3] > 0 {
+                sum[0] += i % 256;
+                sum[1] += i / 256;
+                count += 1;
+            }
+        }
+        assert!(
+            count > 500,
+            "fish disappeared while turning at frame {frame}"
+        );
+        centers.push([sum[0] as f64 / count as f64, sum[1] as f64 / count as f64]);
+        let next = betta_pose(frame + 1, BettaActivity::Unknown, 0.);
+        if (next.dx - pose.dx).abs() > 0.5 {
+            assert_eq!(
+                pose.projection.is_sign_positive(),
+                (next.dx - pose.dx).is_sign_positive()
+            );
+        }
+    }
+    let range = |axis| {
+        centers
+            .iter()
+            .map(|c| c[axis])
+            .fold(f64::NEG_INFINITY, f64::max)
+            - centers
+                .iter()
+                .map(|c| c[axis])
+                .fold(f64::INFINITY, f64::min)
+    };
+    assert!(range(0) > 65., "fish is still hovering instead of swimming");
+    assert!(range(1) > 15.);
+}
+
+#[test]
+fn koi_marbling_contains_visible_gold_and_tangerine_patches() {
+    let image = render_betta(&derive_betta_development(&snapshot()).unwrap());
+    let mut gold = 0;
+    let mut orange = 0;
+    for p in image
+        .as_rgba_bytes()
+        .chunks_exact(4)
+        .filter(|p| p[3] == 255)
+    {
+        if p[0] > 160 && p[1] > 125 && p[2] < 110 && f64::from(p[1]) / f64::from(p[0]) > 0.65 {
+            gold += 1;
+        }
+        if p[0] > 180 && (70..155).contains(&p[1]) && p[2] < 70 {
+            orange += 1;
+        }
+    }
+    assert!(gold > 50, "yellow/gold patches are missing: {gold}");
+    assert!(orange > 50, "orange patches are missing: {orange}");
 }

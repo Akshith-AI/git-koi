@@ -9,8 +9,21 @@ pub fn compose_pond(betta: &KoiFrame, koi: &KoiFrame, frame: u32) -> KoiFrame {
     let phase = f64::from(frame % BETTA_FRAMES) / f64::from(BETTA_FRAMES) * TAU;
     let mut pixels = vec![[0; 4]; (FRAME_WIDTH_PIXELS * FRAME_WIDTH_PIXELS) as usize];
     // Fixed full-frame bounds have a gap even at maximum growth and movement.
-    paste(&mut pixels, betta, [128. + 30. * phase.sin(), 71.], false);
-    paste(&mut pixels, koi, [128. - 30. * phase.sin(), 188.], true);
+    paste(
+        &mut pixels,
+        betta,
+        [
+            128. + 48. * (phase + 0.16 * (phase * 2.).sin()).sin(),
+            64. + 5. * phase.cos(),
+        ],
+        false,
+    );
+    paste(
+        &mut pixels,
+        koi,
+        [128. - 48. * phase.sin(), 192. - 5. * phase.cos()],
+        true,
+    );
     KoiFrame::from_rgba_pixels(pixels)
 }
 

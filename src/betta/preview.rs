@@ -18,7 +18,7 @@ code,a{{color:#9dd9dc}}small{{color:#bccbd3}}
 <div class="panels"><figure class="dark"><img src="betta.png" alt="Koi-marble Halfmoon male betta on dark background"><figcaption>Dark background</figcaption></figure>
 <figure class="light"><img src="betta.png" alt="The same betta on light background"><figcaption>Light background</figcaption></figure></div>
 <p><strong>{total} unique solves</strong> · {easy} Easy / {medium} Medium / {hard} Hard</p>
-<p>Growth follows unique solves. Easy favors ivory, Medium crimson, Hard indigo.
+<p>Growth follows unique solves. Easy favors ivory and gold, Medium crimson and tangerine, Hard indigo.
 Topic proportions warp the marble patches; these are overlapping tag counts, not a disjoint breakdown.</p>
 <p>Blank-topic or restricted-topic accounts keep identity-based marbling. Calendar availability does not shrink the fish.</p>
 <p><a href="betta.svg">SVG portrait</a> · <a href="traits.json">Visual traits</a></p>

@@ -77,20 +77,31 @@ fn render_pose(development: &BettaDevelopment, pose: Option<super::BettaPose>) -
     let mut pixels = vec![[0; 4]; (FRAME_WIDTH_PIXELS * FRAME_WIDTH_PIXELS) as usize];
     for y in 0..FRAME_WIDTH_PIXELS {
         for x in 0..FRAME_WIDTH_PIXELS {
-            let mut point = [
-                (f64::from(x) + 0.5 - 128.) / scale + 128.,
-                (f64::from(y) + 0.5 - 128.) / scale + 128.,
-            ];
+            let mut point = if let Some(pose) = pose {
+                let x = f64::from(x) + 0.5 - 128. - pose.dx;
+                let y = f64::from(y) + 0.5 - 128. - pose.dy;
+                let (sine, cosine) = pose.pitch.sin_cos();
+                [
+                    (cosine * x + sine * y) / pose.projection / (scale * pose.scene_scale) + 128.,
+                    (-sine * x + cosine * y) / (scale * pose.scene_scale) + 128.,
+                ]
+            } else {
+                [
+                    (f64::from(x) + 0.5 - 128.) / scale + 128.,
+                    (f64::from(y) + 0.5 - 128.) / scale + 128.,
+                ]
+            };
             if let Some(pose) = pose {
-                point[0] -= pose.dx;
-                point[1] -= pose.dy;
-                let lag = ((160. - point[0]) / 130.).clamp(0., 1.);
-                point[1] -= (pose.phase * 2. - lag * 2.5).sin() * lag * 5. * pose.energy;
+                let lag = ((174. - point[0]) / 140.).clamp(0., 1.);
+                let stroke = (pose.phase * 4. - lag * 2.8).sin();
+                point[1] -= stroke * lag.powi(2) * 7. * pose.energy;
             }
             let [px, py] = point;
             let spread = pose.map_or(1., |p| 0.72 + 0.28 * p.flare);
             let flutter = pose.map_or(1., |p| {
-                1. + 0.018 * (p.phase * 3. - px * 0.03).sin() * p.energy
+                1. + (0.03 * (p.phase * 4. - px * 0.045).sin()
+                    + 0.012 * (p.phase * 8. - px * 0.06).sin())
+                    * p.energy
             });
             let fin_point = [px, 126. + (py - 126.) / (spread * flutter)];
             let tail_point = [113. + (px - 113.) / spread, fin_point[1]];
