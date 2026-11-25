@@ -1,5 +1,3 @@
-use std::f64::consts::PI;
-
 use super::BettaDevelopment;
 use crate::render::{FRAME_WIDTH_PIXELS, KoiFrame};
 
@@ -95,7 +93,7 @@ pub fn render_betta(development: &BettaDevelopment) -> KoiFrame {
                 }
             }
             if let Some(region) = region {
-                let mut color = base_color(development, point, region);
+                let mut color = super::marble::color(development, point, region);
                 // A dark operculum arc and small upturned mouth distinguish the head.
                 let gill = ((px - 194.) / 10.).powi(2) + ((py - 122.) / 21.).powi(2);
                 if matches!(region, Region::Body) && px < 195. && (0.88..1.08).contains(&gill) {
@@ -123,22 +121,6 @@ pub fn render_betta(development: &BettaDevelopment) -> KoiFrame {
         }
     }
     KoiFrame::from_rgba_pixels(pixels)
-}
-
-fn base_color(_development: &BettaDevelopment, [x, y]: Point, region: Region) -> [u8; 4] {
-    let angle = (y - 126.).atan2(x - 113.);
-    let ray = (angle * 36.).cos();
-    let shade = if matches!(region, Region::Body) {
-        0.92 + 0.08 * ((y - 118.) / 24. * PI).cos()
-    } else {
-        0.83 + 0.17 * ray.abs()
-    };
-    [
-        (220. * shade) as u8,
-        (229. * shade) as u8,
-        (232. * shade) as u8,
-        255,
-    ]
 }
 
 fn outline(start: Point, curves: &[[Point; 3]]) -> Vec<Point> {
