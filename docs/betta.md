@@ -91,7 +91,7 @@ Verified on November 25, 2026, with Rust 1.88.0 on Apple Silicon macOS:
   text, CLI exports, and preserving an existing portrait on invalid input.
 - Beginner, Arrays, Graphs/DP, and expert drawings were visually inspected.
 
-This is a still-image renderer. Swimming, fin movement, the shared pond, and
-website hover/focus/tap flaring remain stage 4. The spread portrait is a
-presentation pose, not an implemented interactive flare. Release packaging and
-an automatically refreshed published Action remain stage 5.
+This command remains a still-image renderer. Stage 4 adds separate animation
+commands, the shared pond, and website hover/focus/tap flaring; see the
+[animation guide](animation.md). Release packaging and an automatically
+refreshed published Action remain stage 5.

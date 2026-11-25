@@ -41,7 +41,7 @@ Acceptance: deterministic still images across representative progress levels,
 with a documented legend for the visual traits. See the [betta guide](betta.md)
 for commands, reproducible examples, and verification.
 
-## 4. Animation and two output modes
+## 4. Animation and two output modes — complete
 
 Animate swimming and fin movement. Provide betta-only output for a LeetCode
 username and a shared pond for separate GitHub and LeetCode usernames. Each fish
@@ -56,7 +56,8 @@ portable README format and cannot react to pointer events.
 
 Acceptance: seamless looping GIFs for both modes, with no clipped fins and with
 both fish readable in the pond; an interactive website preview supports hover,
-keyboard focus, touch, and reduced motion.
+keyboard focus, touch, and reduced motion. See the
+[animation and embedding guide](animation.md) for commands and verification.
 
 ## 5. Release and onboarding
 

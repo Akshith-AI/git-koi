@@ -4,7 +4,8 @@
 > links, and Action example refer to Anthony Yalong's original project. For this
 > LTKoi fork, start with the [local baseline guide](local-baseline.md),
 > [LeetCode collection guide](leetcode.md), or [betta portrait guide](betta.md).
-> Betta animation and the shared pond are planned and are not available yet.
+> The [animation guide](animation.md) covers betta GIFs, the shared pond, and
+> interactive website embeds. Fork-specific release packaging remains stage 5.
 
 Three ways in: a koi on your profile README, the command line, and the library.
 Each stands alone.

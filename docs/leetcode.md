@@ -27,7 +27,8 @@ command syntax exits 2. Existing output files are replaced only after successful
 collection and serialization, using a sibling temporary file.
 
 The `render` command still accepts GitHub snapshots only. Use `render-betta` for
-a still portrait from this JSON. Betta animation remains stage 4.
+a still portrait from this JSON. Use `animate-betta` for the animated mode; see
+the [animation guide](animation.md).
 
 ## Snapshot fields and their meaning
 
@@ -107,8 +108,8 @@ profile request stops collection. Optional failures remain explicit unavailable
 sections; they are not automatically retried.
 
 Run this occasionally, such as once daily, rather than fetching on every website
-hover. Website animation should use already collected data locally. Hover,
-keyboard focus, and touch flaring belong to stage 4, not to data collection.
+hover. The [interactive widget](animation.md) uses pre-rendered frames for
+hover, keyboard focus, and touch flaring rather than making new data requests.
 
 ## Reproduce the tests
 

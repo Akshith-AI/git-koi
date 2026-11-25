@@ -11,10 +11,10 @@ Two output modes are planned:
 - **Pond:** the LeetCode betta alongside a GitHub koi, each developing from its
   own account's activity.
 
-**Current status:** the GitHub koi generator, LeetCode profile collector, and
-male Halfmoon betta still renderer are available. Betta animation, the shared
-pond, and interactive website embed are not implemented yet. The executable and
-Rust package are still named `git-koi`.
+**Current status:** GitHub koi generation, LeetCode collection, betta portraits,
+animated betta and shared-pond GIFs, and interactive website embeds are
+available from this checkout. Release packaging and automated refresh setup
+remain stage 5. The executable and Rust package are still named `git-koi`.
 
 Collect a public LeetCode profile from this checkout:
 
@@ -32,6 +32,15 @@ cargo run --release --locked -- render-betta target/leetcode.json --output-dir t
 
 See the [betta guide and gallery](docs/betta.md) for the visual legend and
 sample portraits. This generates PNG/SVG stills, not an animated betta GIF.
+
+Generate an animated betta and hover-flare website widget:
+
+```sh
+cargo run --release --locked -- animate-betta target/leetcode.json --output-dir target/animated-betta
+```
+
+See the [animation and embedding guide](docs/animation.md) for the shared pond,
+website integration, keyboard/touch controls, and reduced-motion support.
 
 See the [roadmap](docs/roadmap.md) for the five implementation stages and the
 [local baseline guide](docs/local-baseline.md) for a sample render without
