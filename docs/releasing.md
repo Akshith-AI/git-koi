@@ -23,9 +23,11 @@ CHANGELOG.md, alongside a SHA-256 checksum file.
 The workflow stages a draft release, then smoke-tests the reusable Action in all
 three modes by downloading and verifying the actual release binary. These tests
 use committed snapshots so public API outages cannot turn release verification
-into fabricated zero activity. Only after all smoke jobs pass does the workflow
-publish the draft and update the `v0` convenience tag. The full `v0.1.0` tag is
-preferred in copyable examples. No crates.io publication occurs.
+into fabricated zero activity. The release smoke jobs need `contents: write`
+because GitHub hides draft assets from read-only tokens; normal Action consumers
+need only read access after publication. Only after all smoke jobs pass does the
+workflow publish the draft and update the `v0` convenience tag. The full
+`v0.1.0` tag is preferred in copyable examples. No crates.io publication occurs.
 
 Rerunning a failed workflow reuses its existing draft release and replaces that
 run's assets; the release is not public until its smoke tests succeed. An
@@ -47,3 +49,8 @@ The daily workflow uses the checked-out Action in this source repository. The
 profile example pins the published Action tag, so it works in another repository
 without installing Rust. `LTKOI_PUBLISH_WIDGET=true` commits the complete
 bundle; it does not enable or configure website hosting.
+
+To retry a draft release after changing workflow infrastructure, use the Release
+workflow's manual `tag` input, for example `v0.1.0`. It checks out that existing
+tag for every build and smoke test, while using the current workflow definition.
+This preserves the source of the release and avoids moving an existing tag.
