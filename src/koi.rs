@@ -154,11 +154,11 @@ impl fmt::Display for KoiDevelopmentError {
             Self::Repositories(repository_error) => write!(output_formatter, "{repository_error}"),
             Self::MissingLanguageColors => write!(
                 output_formatter,
-                "the snapshot has no language colors; collect it again with `git-koi collect`"
+                "the snapshot has no language colors; collect it again with `ltkoi collect`"
             ),
             Self::MissingLanguageColor(language_name) => write!(
                 output_formatter,
-                "the snapshot has no color for {language_name}; collect it again with `git-koi collect`"
+                "the snapshot has no color for {language_name}; collect it again with `ltkoi collect`"
             ),
         }
     }

@@ -9,13 +9,13 @@ change, and what a pull request looks like.
   [Cargo.toml](Cargo.toml). Install it with [rustup](https://rustup.rs).
 - Node.js, which runs Prettier for documentation and configuration files.
 - The [GitHub CLI](https://cli.github.com), authenticated, to run
-  `git-koi collect` against a real account.
+  `ltkoi collect` against a real account.
 
 ## Build
 
 ```sh
 cargo build --release --locked
-./target/release/git-koi --help
+./target/release/ltkoi --help
 ```
 
 `--locked` keeps `Cargo.lock` as committed.
@@ -89,3 +89,14 @@ privately as [SECURITY.md](SECURITY.md) describes, never in a public issue.
 ## Code of Conduct
 
 This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md).
+
+## Website and Action tests
+
+After building the release binary, generate offline bundles and run the widget
+checks as documented in [docs/animation.md](docs/animation.md). Use `npm ci`,
+install a Playwright browser, and run `npm run test:widget`. The Action scripts
+have additional Rust integration tests in `tests/action_scripts.rs`, covering
+cached modes, validation, failed collection, and actual archive checksums.
+
+Release instructions are in [docs/releasing.md](docs/releasing.md). This fork
+uses GitHub releases and tagged Git installation; it does not publish crates.io.

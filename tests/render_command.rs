@@ -3,13 +3,13 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 
 use chrono::Days;
-use git_koi::behavior::{Behavior, select_behavior};
-use git_koi::coat::KoiBody;
-use git_koi::history::{AccountSnapshot, ContributionDay};
-use git_koi::koi::{KoiDevelopment, derive_koi_development};
-use git_koi::motion::frame_count;
-use git_koi::output::{encode_gif, encode_png};
-use git_koi::render::{KoiFrame, render_koi, render_swim_frame};
+use ltkoi::behavior::{Behavior, select_behavior};
+use ltkoi::coat::KoiBody;
+use ltkoi::history::{AccountSnapshot, ContributionDay};
+use ltkoi::koi::{KoiDevelopment, derive_koi_development};
+use ltkoi::motion::frame_count;
+use ltkoi::output::{encode_gif, encode_png};
+use ltkoi::render::{KoiFrame, render_koi, render_swim_frame};
 
 const HISTORY_FIXTURE: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
@@ -36,7 +36,7 @@ fn render_writes_the_days_loop_still_and_preview_as_the_renderer_draws_them() {
     )
     .unwrap();
     let output_directory = scratch_directory.join("koi");
-    let command_output = run_git_koi(&[
+    let command_output = run_ltkoi(&[
         "render",
         snapshot_path.to_str().unwrap(),
         "--output-dir",
@@ -78,7 +78,7 @@ fn render_writes_the_days_loop_still_and_preview_as_the_renderer_draws_them() {
 #[test]
 fn the_body_option_redraws_the_koi_in_that_body() {
     let output_directory = fresh_directory("render-black");
-    let command_output = run_git_koi(&[
+    let command_output = run_ltkoi(&[
         "render",
         HISTORY_FIXTURE,
         "--output-dir",
@@ -110,14 +110,14 @@ fn a_failed_render_exits_one_and_keeps_the_previous_files() {
         )
         .unwrap();
     }
-    let command_output = run_git_koi(&[
+    let command_output = run_ltkoi(&[
         "render",
         concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures/account.json"),
         "--output-dir",
         output_directory.to_str().unwrap(),
     ]);
     assert_eq!(command_output.status.code(), Some(1));
-    assert!(String::from_utf8_lossy(&command_output.stderr).starts_with("git-koi: "));
+    assert!(String::from_utf8_lossy(&command_output.stderr).starts_with("ltkoi: "));
     for file_name in ["koi.gif", "koi.png", "preview.html"] {
         assert_eq!(
             fs::read_to_string(output_directory.join(file_name)).unwrap(),
@@ -141,7 +141,7 @@ fn render_usage_errors_exit_two_and_help_exits_zero() {
             "red",
         ],
     ] {
-        let command_output = run_git_koi(invalid_arguments);
+        let command_output = run_ltkoi(invalid_arguments);
         assert_eq!(
             command_output.status.code(),
             Some(2),
@@ -149,18 +149,18 @@ fn render_usage_errors_exit_two_and_help_exits_zero() {
         );
         assert!(String::from_utf8_lossy(&command_output.stderr).starts_with("Usage:"));
     }
-    let help_output = run_git_koi(&["render", "--help"]);
+    let help_output = run_ltkoi(&["render", "--help"]);
     assert_eq!(help_output.status.code(), Some(0));
     assert!(String::from_utf8_lossy(&help_output.stdout).contains("platinum"));
 }
 
 #[test]
 fn version_prints_the_manifest_version_and_exits_zero() {
-    let version_output = run_git_koi(&["--version"]);
+    let version_output = run_ltkoi(&["--version"]);
     assert_eq!(version_output.status.code(), Some(0));
     assert_eq!(
         String::from_utf8_lossy(&version_output.stdout),
-        format!("git-koi {}\n", env!("CARGO_PKG_VERSION"))
+        format!("ltkoi {}\n", env!("CARGO_PKG_VERSION"))
     );
 }
 
@@ -180,8 +180,8 @@ fn fresh_directory(directory_name: &str) -> PathBuf {
     directory_path
 }
 
-fn run_git_koi(arguments: &[&str]) -> Output {
-    Command::new(env!("CARGO_BIN_EXE_git-koi"))
+fn run_ltkoi(arguments: &[&str]) -> Output {
+    Command::new(env!("CARGO_BIN_EXE_ltkoi"))
         .args(arguments)
         .output()
         .unwrap()

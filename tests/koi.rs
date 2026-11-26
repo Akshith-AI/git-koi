@@ -1,11 +1,11 @@
 use std::collections::BTreeMap;
 
 use chrono::{Days, NaiveDate};
-use git_koi::history::{
+use ltkoi::history::{
     AccountSnapshot, ConflictingRepository, ContributionDay, ContributionHistory,
     ContributionHistoryError, LanguageColor,
 };
-use git_koi::koi::{KoiDevelopmentError, RecentActivity, RecentStreak, derive_koi_development};
+use ltkoi::koi::{KoiDevelopmentError, RecentActivity, RecentStreak, derive_koi_development};
 
 #[test]
 fn identity_survives_growth_and_language_changes_but_distinguishes_accounts() {
@@ -244,7 +244,7 @@ fn snapshots_without_language_colors_ask_for_a_new_collection() {
         missing_colors
             .unwrap_err()
             .to_string()
-            .contains("git-koi collect")
+            .contains("ltkoi collect")
     );
 }
 

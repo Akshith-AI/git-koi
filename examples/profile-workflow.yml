@@ -1,38 +1,67 @@
-# Copy into your profile repository as .github/workflows/koi.yml, then embed
-# <img src="koi/koi.gif" width="256" alt="My koi"> in its README.md.
-name: Koi
-
+# Copy to your profile repository as .github/workflows/refresh-fish.yml.
+# Set LEETCODE_USERNAME under Settings > Secrets and variables > Actions > Variables.
+# Embed fish/pond.gif in your README, or choose betta/koi and its corresponding GIF.
+name: Refresh fish
 on:
   schedule:
-    # Just after midnight UTC, so the koi shows the day that just ended.
-    - cron: "20 0 * * *"
+    - cron: "23 5 * * *"
   workflow_dispatch:
-  push:
-    paths: [.github/workflows/koi.yml]
-
+    inputs:
+      mode:
+        description: Fish mode
+        type: choice
+        options: [pond, betta, koi]
+        default: pond
+      leetcode_username:
+        description: LeetCode username (blank uses repository variable)
+        type: string
+      github_username:
+        description: GitHub username (blank uses repository owner)
+        type: string
 permissions:
   contents: write
-
-concurrency: koi
-
+concurrency:
+  group: refresh-fish
+  cancel-in-progress: false
 jobs:
-  koi:
+  refresh:
+    if: >-
+      (inputs.mode || vars.LTKOI_MODE || 'pond') == 'koi' ||
+      (inputs.leetcode_username || vars.LEETCODE_USERNAME) != ''
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: yalongwastaken/git-koi@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: Akshith-AI/git-koi@v0.1.0
+        id: fish
         with:
-          body: white
-          output-dir: koi
-      - name: Commit the koi if it changed
-        shell: bash
+          mode: ${{ inputs.mode || vars.LTKOI_MODE || 'pond' }}
+          leetcode-username:
+            ${{ inputs.leetcode_username || vars.LEETCODE_USERNAME }}
+          github-username:
+            ${{ inputs.github_username || vars.LTKOI_GITHUB_USERNAME ||
+            github.repository_owner }}
+          output-dir: fish
+      - name: Commit updated fish
+        env:
+          GIF_PATH: ${{ steps.fish.outputs.gif-path }}
+          INCLUDE_WIDGET: ${{ vars.LTKOI_PUBLISH_WIDGET }}
         run: |
-          git add koi/koi.gif
+          if [ "$INCLUDE_WIDGET" = true ]; then
+            git add -- fish/
+          else
+            git add -- "$GIF_PATH"
+          fi
           if git diff --cached --quiet; then
-            echo "The koi is unchanged; nothing to commit."
+            echo "The fish is unchanged."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit --quiet --message "koi: draw the day's koi"
-          git push --quiet
+          git commit -m "fish: refresh daily activity"
+          git push
+      - name: Attach website preview
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: daily-fish
+          path: fish/
+          if-no-files-found: error

@@ -1,0 +1,29 @@
+{
+  "data": {
+    "matchedUser": {
+      "tagProblemCounts": {
+        "fundamental": [
+          {
+            "tagName": "Array",
+            "tagSlug": "array",
+            "problemsSolved": 6
+          }
+        ],
+        "intermediate": [
+          {
+            "tagName": "Tree",
+            "tagSlug": "tree",
+            "problemsSolved": 3
+          }
+        ],
+        "advanced": [
+          {
+            "tagName": "Dynamic Programming",
+            "tagSlug": "dynamic-programming",
+            "problemsSolved": 3
+          }
+        ]
+      }
+    }
+  }
+}

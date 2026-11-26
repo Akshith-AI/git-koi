@@ -6,18 +6,24 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use std::{env, fs};
 
 use chrono::{DateTime, NaiveDate};
-use git_koi::behavior::{Behavior, select_behavior};
-use git_koi::coat::KoiBody;
-use git_koi::collect::{GhCli, collect_account_snapshot};
-use git_koi::history::AccountSnapshot;
-use git_koi::koi::derive_koi_development;
-use git_koi::motion::frame_count;
-use git_koi::output::{encode_gif, encode_png, encode_preview_html};
-use git_koi::render::{KoiFrame, render_koi, render_swim_frame};
+use ltkoi::behavior::{Behavior, select_behavior};
+use ltkoi::betta::{animation_files, betta_preview, derive_betta_development, render_betta};
+use ltkoi::coat::KoiBody;
+use ltkoi::collect::{GhCli, collect_account_snapshot};
+use ltkoi::history::AccountSnapshot;
+use ltkoi::koi::derive_koi_development;
+use ltkoi::leetcode::{CurlLeetCodeClient, LeetCodeSnapshot, collect_leetcode_snapshot};
+use ltkoi::motion::frame_count;
+use ltkoi::output::{encode_gif, encode_png, encode_preview_html, encode_svg};
+use ltkoi::render::{KoiFrame, render_koi, render_swim_frame};
 
-const USAGE: &str = "Usage: git-koi collect LOGIN [--output FILE]
-       git-koi render SNAPSHOT --output-dir DIR [--body BODY]
-       git-koi --help | --version
+const USAGE: &str = "Usage: ltkoi collect LOGIN [--output FILE]
+       ltkoi collect-leetcode USERNAME [--output FILE]
+       ltkoi animate-betta LEETCODE_SNAPSHOT --output-dir DIR
+       ltkoi animate-pond GITHUB_SNAPSHOT LEETCODE_SNAPSHOT --output-dir DIR
+       ltkoi render-betta SNAPSHOT --output-dir DIR
+       ltkoi render SNAPSHOT --output-dir DIR [--body BODY]
+       ltkoi --help | --version
 Collect LOGIN's public GitHub snapshot as JSON through `gh api`: public owned and
 contributed repositories, and daily contributions from the account's creation
 through yesterday (UTC), the last complete day.
@@ -27,9 +33,17 @@ Render a collected SNAPSHOT into DIR: koi.gif swims the behavior chosen for its
 observation date, koi.png is the still koi, and preview.html shows both on light and
 dark backgrounds. BODY is white (the default), black, asagi, tea, gold, or platinum.
 The files are replaced only after all of them render.
+Collect-leetcode writes a versioned public LeetCode snapshot as JSON using curl.
+No login is needed. Optional unavailable fields include a diagnostic instead of zero.
+Render-betta reads a LeetCode snapshot and writes betta.png, betta.svg, traits.json,
+and preview.html. It draws a still male Halfmoon with koi marbling, not an animation.
+Render accepts GitHub snapshots only. Collection output parents must already exist.
+Animate-betta exports a looping GIF and an interactive website widget.
+Animate-pond adds an independently developed GitHub koi. Copy the complete output
+folder to a website; embed.html supports hover, focus, tap, and reduced motion.
 Errors go to stderr and exit 1; invalid usage exits 2.
-Examples: git-koi collect octocat --output snapshot.json
-          git-koi render snapshot.json --output-dir koi --body asagi";
+Examples: ltkoi collect octocat --output snapshot.json
+          ltkoi render snapshot.json --output-dir koi --body asagi";
 
 /// Each body's name on the command line.
 const BODY_NAMES: [(&str, KoiBody); 6] = [
@@ -48,17 +62,62 @@ fn main() -> ExitCode {
         .map(|argument| argument.to_str())
         .collect();
     match argument_texts.as_slice() {
-        [Some("--help")] | [Some("collect" | "render"), Some("--help")] => {
+        [Some("--help")]
+        | [
+            Some(
+                "collect" | "collect-leetcode" | "render" | "render-betta" | "animate-betta"
+                | "animate-pond",
+            ),
+            Some("--help"),
+        ] => {
             println!("{USAGE}");
             ExitCode::SUCCESS
         }
         [Some("--version")] => {
-            println!("git-koi {}", env!("CARGO_PKG_VERSION"));
+            println!("ltkoi {}", env!("CARGO_PKG_VERSION"));
             ExitCode::SUCCESS
+        }
+        [Some("collect-leetcode"), Some(username)] if !username.starts_with('-') => {
+            run_collect_leetcode(username, None)
+        }
+        [
+            Some("collect-leetcode"),
+            Some(username),
+            Some("--output"),
+            _,
+        ] if !username.starts_with('-') => {
+            run_collect_leetcode(username, Some(Path::new(&program_arguments[3])))
         }
         [Some("collect"), Some(login)] if !login.starts_with('-') => run_collect(login, None),
         [Some("collect"), Some(login), Some("--output"), _] if !login.starts_with('-') => {
             run_collect(login, Some(Path::new(&program_arguments[3])))
+        }
+        [
+            Some("animate-betta"),
+            Some(profile),
+            Some("--output-dir"),
+            _,
+        ] if !profile.starts_with('-') => {
+            run_animation(Path::new(profile), None, Path::new(&program_arguments[3]))
+        }
+        [
+            Some("animate-pond"),
+            Some(github),
+            Some(profile),
+            Some("--output-dir"),
+            _,
+        ] if !github.starts_with('-') && !profile.starts_with('-') => run_animation(
+            Path::new(profile),
+            Some(Path::new(github)),
+            Path::new(&program_arguments[4]),
+        ),
+        [
+            Some("render-betta"),
+            Some(snapshot_path),
+            Some("--output-dir"),
+            _,
+        ] if !snapshot_path.starts_with('-') => {
+            run_render_betta(Path::new(snapshot_path), Path::new(&program_arguments[3]))
         }
         [Some("render"), Some(snapshot_path), Some("--output-dir"), _]
             if !snapshot_path.starts_with('-') =>
@@ -88,6 +147,91 @@ fn main() -> ExitCode {
     }
 }
 
+fn run_animation(profile_path: &Path, github_path: Option<&Path>, directory: &Path) -> ExitCode {
+    let result = (|| -> Result<(), String> {
+        let profile: LeetCodeSnapshot =
+            serde_json::from_slice(&fs::read(profile_path).map_err(|e| e.to_string())?)
+                .map_err(|e| e.to_string())?;
+        let github: Option<AccountSnapshot> = github_path
+            .map(|path| {
+                serde_json::from_slice(&fs::read(path).map_err(|e| e.to_string())?)
+                    .map_err(|e| e.to_string())
+            })
+            .transpose()?;
+        let files = animation_files(&profile, github.as_ref())?;
+        fs::create_dir_all(directory).map_err(|e| e.to_string())?;
+        for (name, contents) in files {
+            replace_file(&directory.join(name), &contents)?;
+        }
+        println!(
+            "Animated {}: wrote {}",
+            if github.is_some() { "pond" } else { "betta" },
+            directory.display()
+        );
+        Ok(())
+    })();
+    match result {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(error) => {
+            eprintln!("ltkoi: {error}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+fn run_render_betta(snapshot_path: &Path, directory: &Path) -> ExitCode {
+    let result = (|| -> Result<(), String> {
+        let bytes = fs::read(snapshot_path).map_err(|e| e.to_string())?;
+        let snapshot: LeetCodeSnapshot =
+            serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+        let traits = derive_betta_development(&snapshot).map_err(|e| e.to_string())?;
+        let frame = render_betta(&traits);
+        let files = [
+            ("betta.png", encode_png(&frame).map_err(|e| e.to_string())?),
+            ("betta.svg", encode_svg(&frame).into_bytes()),
+            ("preview.html", betta_preview(&snapshot).into_bytes()),
+            (
+                "traits.json",
+                serde_json::to_vec_pretty(&serde_json::json!({
+                    "identity_seed": traits.identity_seed, "solved": traits.solved,
+                    "growth": traits.growth, "difficulty_shares": traits.difficulty_shares,
+                    "topic_weights": traits.topic_weights,
+                }))
+                .map_err(|e| e.to_string())?,
+            ),
+        ];
+        fs::create_dir_all(directory).map_err(|e| e.to_string())?;
+        for (name, contents) in files {
+            replace_file(&directory.join(name), &contents)?;
+        }
+        println!("Halfmoon male betta: wrote {}", directory.display());
+        Ok(())
+    })();
+    match result {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(error) => {
+            eprintln!("ltkoi: {error}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+fn run_collect_leetcode(username: &str, output_path: Option<&Path>) -> ExitCode {
+    let result = collect_leetcode_snapshot(&CurlLeetCodeClient, username, current_utc_date())
+        .map_err(|error| error.to_string())
+        .and_then(|snapshot| {
+            serde_json::to_string_pretty(&snapshot).map_err(|error| error.to_string())
+        })
+        .and_then(|json| write_snapshot(&format!("{json}\n"), output_path));
+    match result {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(message) => {
+            eprintln!("ltkoi: {message}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
 fn run_collect(login: &str, output_path: Option<&Path>) -> ExitCode {
     let collection_result = collect_account_snapshot(&GhCli, login, current_utc_date())
         .map_err(|collection_error| collection_error.to_string())
@@ -99,7 +243,7 @@ fn run_collect(login: &str, output_path: Option<&Path>) -> ExitCode {
     match collection_result {
         Ok(()) => ExitCode::SUCCESS,
         Err(error_message) => {
-            eprintln!("git-koi: {error_message}");
+            eprintln!("ltkoi: {error_message}");
             ExitCode::FAILURE
         }
     }
@@ -125,7 +269,7 @@ fn run_render(snapshot_path: &Path, output_directory: &Path, koi_body: KoiBody) 
     match render_result {
         Ok(()) => ExitCode::SUCCESS,
         Err(error_message) => {
-            eprintln!("git-koi: {error_message}");
+            eprintln!("ltkoi: {error_message}");
             ExitCode::FAILURE
         }
     }

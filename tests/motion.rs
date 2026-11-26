@@ -1,7 +1,7 @@
 use std::f64::consts::TAU;
 
-use git_koi::behavior::Behavior;
-use git_koi::motion::{Course, SwimPose, calculate_swim_pose, frame_count};
+use ltkoi::behavior::Behavior;
+use ltkoi::motion::{Course, SwimPose, calculate_swim_pose, frame_count};
 
 /// A pose value's name, how to read it, and whether it wraps around a full turn and
 /// so is compared around the circle.

@@ -1,0 +1,27 @@
+{
+  "data": {
+    "matchedUser": {
+      "username": "ExampleCoder",
+      "submitStatsGlobal": {
+        "acSubmissionNum": [
+          {
+            "difficulty": "All",
+            "count": 10
+          },
+          {
+            "difficulty": "Easy",
+            "count": 4
+          },
+          {
+            "difficulty": "Medium",
+            "count": 5
+          },
+          {
+            "difficulty": "Hard",
+            "count": 1
+          }
+        ]
+      }
+    }
+  }
+}

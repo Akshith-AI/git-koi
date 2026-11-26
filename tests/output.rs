@@ -1,11 +1,11 @@
 use std::sync::OnceLock;
 
-use git_koi::behavior::Behavior;
-use git_koi::coat::KoiBody;
-use git_koi::history::AccountSnapshot;
-use git_koi::koi::derive_koi_development;
-use git_koi::output::{GifEncodingError, STATIC_HEIGHT_PIXELS, STATIC_WIDTH_PIXELS, encode_gif};
-use git_koi::render::{FRAME_WIDTH_PIXELS, KoiFrame, render_swim_frame};
+use ltkoi::behavior::Behavior;
+use ltkoi::coat::KoiBody;
+use ltkoi::history::AccountSnapshot;
+use ltkoi::koi::derive_koi_development;
+use ltkoi::output::{GifEncodingError, STATIC_HEIGHT_PIXELS, STATIC_WIDTH_PIXELS, encode_gif};
+use ltkoi::render::{FRAME_WIDTH_PIXELS, KoiFrame, render_swim_frame};
 
 #[test]
 fn the_gif_rebuilds_every_frame_exactly_at_twice_the_size() {

@@ -1,7 +1,7 @@
 use chrono::{Datelike, Days, NaiveDate};
-use git_koi::history::{AccountSnapshot, ContributionDay, ContributionHistory, ContributionWeek};
-use git_koi::koi::{KoiDevelopment, RecentStreak, derive_koi_development};
-use git_koi::markings::calculate_streak_marks;
+use ltkoi::history::{AccountSnapshot, ContributionDay, ContributionHistory, ContributionWeek};
+use ltkoi::koi::{KoiDevelopment, RecentStreak, derive_koi_development};
+use ltkoi::markings::calculate_streak_marks;
 
 #[test]
 fn streak_fins_build_linearly_to_full_at_thirteen_weeks() {
