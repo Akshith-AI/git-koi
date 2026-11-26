@@ -15,6 +15,9 @@ and a self-contained website widget with hover, keyboard, and tap flaring.
 The example above uses synthetic data. The configured daily pond for this fork
 uses **Hecker2026** on LeetCode and **Akshith-AI** on GitHub.
 
+[View the live daily pond](fish/pond.gif) ·
+[Refresh status and website bundle](https://github.com/Akshith-AI/git-koi/actions/workflows/refresh-fish.yml)
+
 ## Put a fish on your GitHub profile
 
 1. Copy [examples/profile-workflow.yml](examples/profile-workflow.yml) into your

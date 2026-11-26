@@ -59,7 +59,7 @@ both fish readable in the pond; an interactive website preview supports hover,
 keyboard focus, touch, and reduced motion. See the
 [animation and embedding guide](animation.md) for commands and verification.
 
-## 5. Release and onboarding — release verification
+## 5. Release and onboarding — complete
 
 Adapt the Action and release packaging for this fork. Document username inputs,
 mode selection, daily refresh, examples, attribution, and the trait legend.
@@ -69,3 +69,10 @@ original upstream license and attribution remain intact.
 
 Acceptance: a new user can follow the instructions and generate either mode from
 a published release. Publishing is a later stage, not part of the foundation.
+
+Release verification:
+[LTKoi v0.1.0](https://github.com/Akshith-AI/git-koi/releases/tag/v0.1.0) was
+published after all five platform builds and all three downloaded-Action smoke
+tests passed. All stages were merged through
+[pull request #1](https://github.com/Akshith-AI/git-koi/pull/1). The fork's
+daily Refresh fish workflow uses Hecker2026 and Akshith-AI in pond mode.

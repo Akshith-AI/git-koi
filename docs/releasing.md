@@ -54,3 +54,18 @@ To retry a draft release after changing workflow infrastructure, use the Release
 workflow's manual `tag` input, for example `v0.1.0`. It checks out that existing
 tag for every build and smoke test, while using the current workflow definition.
 This preserves the source of the release and avoids moving an existing tag.
+
+## First release verification
+
+[Release run](https://github.com/Akshith-AI/git-koi/actions/runs/45729108511):
+all five platform archives built, all three downloaded Action modes passed, and
+the release was published as v0.1.0. Installation from a clean source checkout
+and checksum verification/execution of the downloaded Apple Silicon release
+binary passed. The original MIT license and attribution are included in every
+archive.
+
+[First live daily refresh](https://github.com/Akshith-AI/git-koi/actions/runs/45747131169)
+passed for Hecker2026 + Akshith-AI in pond mode, committed `fish/pond.gif`, and
+attached the complete website bundle. The committed GIF was decoded and verified
+as a 60-frame, four-second continuous loop. Scheduled refresh is active at 05:23
+UTC; the source repository variables hold the configured accounts and mode.
